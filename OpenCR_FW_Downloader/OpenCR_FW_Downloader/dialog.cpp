@@ -7,6 +7,7 @@
 #include <QTextCodec>
 #include <QCoreApplication>
 #include <QMessageBox>
+#include <QDebug>
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -75,6 +76,9 @@ Dialog::Dialog(QWidget *parent) :
     connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
     connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
 
+    ui->tb_hexview->setRowCount(1);
+    ui->tb_hexview->setColumnCount(1);
+    ui->tb_hexview->setItem(0, 0, new QTableWidgetItem("empty"));
 
     setWindowTitle("OpenCR Firmware Downloader v1.0");
 }
@@ -200,7 +204,7 @@ void Dialog::on_pushButton_LoadFirmware_clicked()
         selectedFile.append(fileNames.at(nIndex).toLocal8Bit().constData());
     }
 
-    QTextCodec *textCodec = QTextCodec::codecForName("eucKR");
+    //QTextCodec *textCodec = QTextCodec::codecForName("eucKR");
     ui->textEdit_Log->setText(selectedFile.toUtf8());
 
     QFile file(selectedFile.toUtf8());
@@ -208,10 +212,25 @@ void Dialog::on_pushButton_LoadFirmware_clicked()
         QMessageBox::information(0,"error",file.errorString());
     }
 
-    while(!file.atEnd()){
-        QByteArray line = file.readLine();
-        ui->progressBar_Status->setValue(100*line.count()*line.size());
-    }
+
+    QByteArray ba;
+    //QDataStream dataStreamReader(&file);
+    //dataStreamReader >> ba;
+
+    ba = file.readAll();
+
+    QString s2 = ba.toHex();
+    qDebug() << s2;
+
+       // ui->progressBar_Status->setValue(100*line.count()*line.size());
+   // }
+
+    int n = file.size();
+    ui->tb_hexview->setRowCount((n/32) +1);
+    ui->tb_hexview->setColumnCount(8);
+
+   // QString DataAsString = line.data()[0];//QTextCodec::codecForMib("eucKR")->toUnicode(line.data()[0]);
+   // ui->tb_hexview->setItem(0, 1, new QTableWidgetItem(DataAsString));
 
     file.close();
 }
