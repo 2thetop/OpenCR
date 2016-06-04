@@ -53,6 +53,11 @@ Dialog::Dialog(QWidget *parent) :
 
     timer = new QTimer(this);
     timer->setInterval(40);
+
+    timer_colck = new QTimer(this);
+    connect(timer_colck, SIGNAL(timeout()), this, SLOT(onClockLabelUpdate()));
+    timer_colck->start(1000);
+
     //! [1]
     PortSettings settings = {BAUD9600, DATA_8, PAR_NONE, STOP_1, FLOW_OFF, 10};
     port = new QextSerialPort(ui->portBox->currentText(), settings, QextSerialPort::Polling);
@@ -78,7 +83,10 @@ Dialog::Dialog(QWidget *parent) :
 
     ui->tb_hexview->setRowCount(1);
     ui->tb_hexview->setColumnCount(1);
-    ui->tb_hexview->setItem(0, 0, new QTableWidgetItem("empty"));
+    ui->tb_hexview->setItem(0, 0, new QTableWidgetItem(" "));
+
+    QDateTime local(QDateTime::currentDateTime());
+    ui->label_13->setText(local.toString());
 
     setWindowTitle("OpenCR Firmware Downloader v1.0");
 }
@@ -174,6 +182,14 @@ void Dialog::onReadyRead()
     }
 }
 
+void Dialog::onClockLabelUpdate()
+{
+    QDateTime local(QDateTime::currentDateTime());
+    ui->label_13->setText(local.toString("hh:mm:ss A"));
+
+    //onTextBoxLogPrint("test\r\n");
+}
+
 void Dialog::onPortAddedOrRemoved()
 {
     QString current = ui->portBox->currentText();
@@ -205,7 +221,8 @@ void Dialog::on_pushButton_LoadFirmware_clicked()
     }
 
     //QTextCodec *textCodec = QTextCodec::codecForName("eucKR");
-    ui->textEdit_Log->setText(selectedFile.toUtf8());
+   // ui->textEdit_Log->setText(selectedFile.toUtf8());
+    onTextBoxLogPrint(selectedFile.toUtf8());
 
     QFile file(selectedFile.toUtf8());
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
@@ -233,4 +250,22 @@ void Dialog::on_pushButton_LoadFirmware_clicked()
    // ui->tb_hexview->setItem(0, 1, new QTableWidgetItem(DataAsString));
 
     file.close();
+}
+
+void Dialog::onTextBoxLogPrint(QString str)
+{
+    QDateTime local(QDateTime::currentDateTime());
+
+    ui->textEdit_Log->setTextColor(QColor(0x00,0x00,0x97));
+    ui->textEdit_Log->insertPlainText("\r\n"+local.toString()+" : ");
+
+//ui->textEdit_Log->textCursor().deletePreviousChar();
+    ui->textEdit_Log->moveCursor (QTextCursor::End);
+    ui->textEdit_Log->setTextColor(QColor(0x00,0x00,0x00));
+    ui->textEdit_Log->insertPlainText(str);
+    ui->textEdit_Log->moveCursor (QTextCursor::End);
+
+
+  //  ui->textEdit_Log->append(str);
+
 }

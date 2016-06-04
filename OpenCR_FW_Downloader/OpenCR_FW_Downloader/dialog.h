@@ -32,11 +32,13 @@ private slots:
     void onOpenCloseButtonClicked();
     void onSendButtonClicked();
     void onReadyRead();
-
+    void onClockLabelUpdate();
+    void onTextBoxLogPrint(QString str);
     void onPortAddedOrRemoved();
 private:
     Ui::Dialog *ui;
     QTimer *timer;
+    QTimer *timer_colck;
     QextSerialPort *port;
     QextSerialEnumerator *enumerator;
 };
