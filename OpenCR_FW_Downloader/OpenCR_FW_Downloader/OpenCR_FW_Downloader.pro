@@ -13,8 +13,21 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        dialog.cpp
+        dialog.cpp \
+    qextserial/qextserialenumerator.cpp \
+    qextserial/qextserialenumerator_linux.cpp \
+    qextserial/qextserialenumerator_osx.cpp \
+    qextserial/qextserialenumerator_unix.cpp \
+    qextserial/qextserialenumerator_win.cpp \
+    qextserial/qextserialport.cpp \
+    qextserial/qextserialport_unix.cpp \
+    qextserial/qextserialport_win.cpp
 
-HEADERS  += dialog.h
+HEADERS  += dialog.h \
+    qextserial/qextserialenumerator.h \
+    qextserial/qextserialenumerator_p.h \
+    qextserial/qextserialport.h \
+    qextserial/qextserialport_global.h \
+    qextserial/qextserialport_p.h
 
 FORMS    += dialog.ui
