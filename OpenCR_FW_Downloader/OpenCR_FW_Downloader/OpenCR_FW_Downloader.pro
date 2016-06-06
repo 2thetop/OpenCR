@@ -17,8 +17,10 @@ SOURCES += main.cpp\
         dialog.cpp \
     hled.cpp
 
+
 HEADERS  += dialog.h \
     hled.h
+
 
 FORMS    += dialog.ui
 

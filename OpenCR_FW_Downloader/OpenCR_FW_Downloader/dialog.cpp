@@ -230,24 +230,54 @@ void Dialog::on_pushButton_LoadFirmware_clicked()
     }
 
 
-    QByteArray ba;
+
     //QDataStream dataStreamReader(&file);
     //dataStreamReader >> ba;
 
-    ba = file.readAll();
+   // ba = file.readAll();
 
-    QString s2 = ba.toHex();
-    qDebug() << s2;
-
+    //QString s2 = ba.toHex();
+    //qDebug() << s2;
+    //onTextBoxLogPrint(s2);
        // ui->progressBar_Status->setValue(100*line.count()*line.size());
    // }
 
-    int n = file.size();
-    ui->tb_hexview->setRowCount((n/32) +1);
-    ui->tb_hexview->setColumnCount(8);
+    int file_size = file.size();
+    onTextBoxLogPrint(QString("file size : %1 bytes").arg(QString::number(file_size)));
+    ui->tb_hexview->setRowCount((file_size/16) +1);
+    ui->tb_hexview->setColumnCount(4);
 
-   // QString DataAsString = line.data()[0];//QTextCodec::codecForMib("eucKR")->toUnicode(line.data()[0]);
-   // ui->tb_hexview->setItem(0, 1, new QTableWidgetItem(DataAsString));
+    for(int index=0; index < file_size; index = index+4)
+    {
+        QByteArray ba;
+        QString tmpstr;
+
+        char buf[4];
+        file.seek(index);
+        file.read(buf,4);
+
+        ba = QByteArray::fromRawData(buf, 4);
+
+        tmpstr = ba.mid(3,1).toHex().rightJustified(2,'0');
+        tmpstr += ba.mid(2,1).toHex().rightJustified(2,'0');
+        tmpstr += ba.mid(1,1).toHex().rightJustified(2,'0');
+        tmpstr += ba.mid(0,1).toHex().rightJustified(2,'0');
+
+
+
+        //tmpstr.append( QString::number(ba.at(3), 16).rightJustified(2, '0') );
+        //tmpstr.append( QString::number(ba.at(2), 16).rightJustified(2, '0') );
+        //tmpstr.append( QString::number(ba.at(1), 16).rightJustified(2, '0') );
+        //tmpstr.append( QString::number(ba.at(0), 16).rightJustified(2, '0') );
+
+        if(49152<index)
+        {
+            qDebug()<< index << tmpstr;
+        }
+        ui->tb_hexview->setItem((index/4)/4, (index/4)%4, new QTableWidgetItem(tmpstr.toUpper()));
+
+    }
+
 
     file.close();
 }

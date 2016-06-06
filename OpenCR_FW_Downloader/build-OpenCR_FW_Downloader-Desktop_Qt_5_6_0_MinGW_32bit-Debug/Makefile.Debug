@@ -1335,7 +1335,8 @@ debug/dialog.o: ../OpenCR_FW_Downloader/dialog.cpp ../OpenCR_FW_Downloader/dialo
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtCore/QTextCodec \
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtCore/QCoreApplication \
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtWidgets/QMessageBox \
-		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtWidgets/qmessagebox.h
+		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtWidgets/qmessagebox.h \
+		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\dialog.o ..\OpenCR_FW_Downloader\dialog.cpp
 
 debug/hled.o: ../OpenCR_FW_Downloader/hled.cpp C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtGui/QtGui \
