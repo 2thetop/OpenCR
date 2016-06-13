@@ -52,21 +52,10 @@ BOOL msg_recv( uint8_t chan, uint8_t data , mavlink_message_t *p_msg, mavlink_st
 {
   BOOL ret = FALSE;
 
-
-  if(chan == 0)
-  {
-    if (mavlink_parse_char(MAVLINK_COMM_0, data, p_msg, p_status) == MAVLINK_FRAMING_OK)
-    {
-      ret = TRUE;
-    }
-  }
-  else
-  {
-    if (mavlink_parse_char(MAVLINK_COMM_1, data, p_msg, p_status) == MAVLINK_FRAMING_OK)
-    {
-      ret = TRUE;
-    }
-  }
+if (mavlink_parse_char(MAVLINK_COMM_0, data, p_msg, p_status) == MAVLINK_FRAMING_OK)
+{
+  ret = TRUE;
+}
 
   return ret;
 }

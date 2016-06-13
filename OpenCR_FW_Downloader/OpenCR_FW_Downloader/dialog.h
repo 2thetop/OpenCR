@@ -48,4 +48,8 @@ public:
 
 };
 
+
+
+
+
 #endif // DIALOG_H
