@@ -9,6 +9,10 @@
 #include <QMessageBox>
 #include <QDebug>
 
+#include "./msg/msg.h"
+
+
+
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
@@ -297,5 +301,11 @@ void Dialog::onTextBoxLogPrint(QString str)
 
 
   //  ui->textEdit_Log->append(str);
+
+}
+
+void Dialog::on_sendButton_clicked()
+{
+
 
 }

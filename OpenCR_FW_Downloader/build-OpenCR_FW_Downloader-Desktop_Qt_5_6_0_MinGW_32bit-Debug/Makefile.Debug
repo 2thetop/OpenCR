@@ -49,7 +49,8 @@ SOURCES       = ..\OpenCR_FW_Downloader\qextserialport\qextserialport.cpp \
 		..\OpenCR_FW_Downloader\qextserialport\qextserialenumerator_win.cpp \
 		..\OpenCR_FW_Downloader\main.cpp \
 		..\OpenCR_FW_Downloader\dialog.cpp \
-		..\OpenCR_FW_Downloader\hled.cpp debug\moc_dialog.cpp \
+		..\OpenCR_FW_Downloader\hled.cpp \
+		..\OpenCR_FW_Downloader\msg\msg.c debug\moc_dialog.cpp \
 		debug\moc_hled.cpp
 OBJECTS       = debug/qextserialport.o \
 		debug/qextserialenumerator.o \
@@ -58,6 +59,7 @@ OBJECTS       = debug/qextserialport.o \
 		debug/main.o \
 		debug/dialog.o \
 		debug/hled.o \
+		debug/msg.o \
 		debug/moc_dialog.o \
 		debug/moc_hled.o
 
@@ -67,13 +69,40 @@ DIST          =  ..\OpenCR_FW_Downloader\qextserialport\qextserialport.h \
 		..\OpenCR_FW_Downloader\qextserialport\qextserialport_p.h \
 		..\OpenCR_FW_Downloader\qextserialport\qextserialenumerator_p.h \
 		..\OpenCR_FW_Downloader\dialog.h \
-		..\OpenCR_FW_Downloader\hled.h ..\OpenCR_FW_Downloader\qextserialport\qextserialport.cpp \
+		..\OpenCR_FW_Downloader\hled.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_ack.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_flash_fw_erase.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_flash_fw_read_block.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_flash_fw_read_packet.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_flash_fw_verify.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_flash_fw_write_begin.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_flash_fw_write_block.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_flash_fw_write_end.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_flash_fw_write_packet.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_jump_to_fw.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_read_board_name.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_read_tag.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\mavlink_msg_read_version.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\opencr_msg.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\testsuite.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\opencr_msg\version.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\checksum.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\mavlink_conversions.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\mavlink_helpers.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\mavlink_types.h \
+		..\OpenCR_FW_Downloader\msg\mavlink\protocol.h \
+		..\OpenCR_FW_Downloader\msg\def.h \
+		..\OpenCR_FW_Downloader\msg\def_err.h \
+		..\OpenCR_FW_Downloader\msg\msg.h \
+		..\OpenCR_FW_Downloader\type.h ..\OpenCR_FW_Downloader\qextserialport\qextserialport.cpp \
 		..\OpenCR_FW_Downloader\qextserialport\qextserialenumerator.cpp \
 		..\OpenCR_FW_Downloader\qextserialport\qextserialport_win.cpp \
 		..\OpenCR_FW_Downloader\qextserialport\qextserialenumerator_win.cpp \
 		..\OpenCR_FW_Downloader\main.cpp \
 		..\OpenCR_FW_Downloader\dialog.cpp \
-		..\OpenCR_FW_Downloader\hled.cpp
+		..\OpenCR_FW_Downloader\hled.cpp \
+		..\OpenCR_FW_Downloader\msg\msg.c
 QMAKE_TARGET  = OpenCR_FW_Downloader
 DESTDIR        = debug\ #avoid trailing-slash linebreak
 TARGET         = OpenCR_FW_Downloader.exe
@@ -85,7 +114,7 @@ first: all
 all: Makefile.Debug  $(DESTDIR_TARGET)
 
 $(DESTDIR_TARGET): ui_dialog.h $(OBJECTS) 
-	$(LINKER) $(LFLAGS) -o $(DESTDIR_TARGET) $(OBJECTS)  $(LIBS)
+	$(LINKER) $(LFLAGS) -o $(DESTDIR_TARGET) object_script.OpenCR_FW_Downloader.Debug  $(LIBS)
 
 qmake: FORCE
 	@$(QMAKE) -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug" -o Makefile.Debug ..\OpenCR_FW_Downloader\OpenCR_FW_Downloader.pro
@@ -96,7 +125,7 @@ dist:
 	$(ZIP) OpenCR_FW_Downloader.zip $(SOURCES) $(DIST) ..\OpenCR_FW_Downloader\OpenCR_FW_Downloader.pro C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\spec_pre.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\qdevice.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\device_config.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\common\angle.conf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\qconfig.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dcore.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dcore_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dinput.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dinput_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dlogic.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dlogic_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquick.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquick_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquickinput.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquickinput_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquickrender.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquickrender_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3drender.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_3drender_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_axbase.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_axbase_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_axcontainer.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_axcontainer_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_axserver.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_axserver_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_bluetooth.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_bluetooth_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_bootstrap_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_clucene_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_concurrent.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_concurrent_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_core.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_core_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_dbus.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_dbus_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_designer.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_designer_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_designercomponents_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_gui.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_gui_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_help.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_help_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_labscontrols_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_labstemplates_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_location.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_location_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_multimedia.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_multimedia_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_multimediawidgets.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_multimediawidgets_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_network.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_network_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_nfc.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_nfc_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_opengl.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_opengl_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_openglextensions.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_openglextensions_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_platformsupport_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_positioning.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_positioning_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_printsupport.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_printsupport_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_qml.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_qml_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_qmldevtools_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_qmltest.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_qmltest_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_quick.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_quick_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_quickparticles_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_quickwidgets.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_quickwidgets_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_script.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_script_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_scripttools.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_scripttools_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_sensors.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_sensors_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_serialbus.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_serialbus_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_serialport.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_serialport_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_sql.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_sql_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_svg.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_svg_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_testlib.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_testlib_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_uiplugin.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_uitools.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_uitools_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_webchannel.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_webchannel_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_websockets.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_websockets_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_widgets.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_widgets_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_winextras.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_winextras_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_xml.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_xml_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_xmlpatterns.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\modules\qt_lib_xmlpatterns_private.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\qt_functions.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\qt_config.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\win32\qt_config.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\win32-g++\qmake.conf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\spec_post.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\exclusive_builds.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\default_pre.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\win32\default_pre.prf ..\OpenCR_FW_Downloader\qextserialport\qextserialport.pri C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\resolve_config.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\exclusive_builds_post.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\default_post.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\build_pass.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\qml_debug.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\win32\rtti.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\precompile_header.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\warn_on.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\qt.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\resources.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\moc.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\win32\opengl.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\uic.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\win32\windows.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\testcase_targets.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\exceptions.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\yacc.prf C:\Qt\Qt5.6.0\5.6\mingw49_32\mkspecs\features\lex.prf ..\OpenCR_FW_Downloader\OpenCR_FW_Downloader.pro C:\Qt\Qt5.6.0\5.6\mingw49_32\lib\qtmaind.prl C:\Qt\Qt5.6.0\5.6\mingw49_32\lib\Qt5Widgetsd.prl C:\Qt\Qt5.6.0\5.6\mingw49_32\lib\Qt5Guid.prl C:\Qt\Qt5.6.0\5.6\mingw49_32\lib\Qt5Cored.prl  NO_PCH_SOURCES RESOURCES HEADERS SOURCES OBJECTIVE_SOURCES FORMS YACCSOURCES YACCSOURCES LEXSOURCES 
 
 clean: compiler_clean 
-	-$(DEL_FILE) debug\qextserialport.o debug\qextserialenumerator.o debug\qextserialport_win.o debug\qextserialenumerator_win.o debug\main.o debug\dialog.o debug\hled.o debug\moc_dialog.o debug\moc_hled.o
+	-$(DEL_FILE) debug\qextserialport.o debug\qextserialenumerator.o debug\qextserialport_win.o debug\qextserialenumerator_win.o debug\main.o debug\dialog.o debug\hled.o debug\msg.o debug\moc_dialog.o debug\moc_hled.o
 
 distclean: clean 
 	-$(DEL_FILE) $(DESTDIR_TARGET)
@@ -1336,7 +1365,31 @@ debug/dialog.o: ../OpenCR_FW_Downloader/dialog.cpp ../OpenCR_FW_Downloader/dialo
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtCore/QCoreApplication \
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtWidgets/QMessageBox \
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtWidgets/qmessagebox.h \
-		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtCore/QDebug
+		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtCore/QDebug \
+		../OpenCR_FW_Downloader/msg/msg.h \
+		../OpenCR_FW_Downloader/msg/def.h \
+		../OpenCR_FW_Downloader/msg/def_err.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/version.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/opencr_msg.h \
+		../OpenCR_FW_Downloader/msg/mavlink/protocol.h \
+		../OpenCR_FW_Downloader/msg/mavlink/mavlink_types.h \
+		../OpenCR_FW_Downloader/msg/mavlink/mavlink_helpers.h \
+		../OpenCR_FW_Downloader/msg/mavlink/checksum.h \
+		../OpenCR_FW_Downloader/msg/mavlink/mavlink_conversions.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_ack.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_read_version.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_read_board_name.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_read_tag.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_write_begin.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_write_end.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_write_packet.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_write_block.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_erase.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_verify.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_read_packet.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_read_block.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_jump_to_fw.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\dialog.o ..\OpenCR_FW_Downloader\dialog.cpp
 
 debug/hled.o: ../OpenCR_FW_Downloader/hled.cpp C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtGui/QtGui \
@@ -1657,6 +1710,32 @@ debug/hled.o: ../OpenCR_FW_Downloader/hled.cpp C:/Qt/Qt5.6.0/5.6/mingw49_32/incl
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtWidgets/qwidget.h \
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/include/QtWidgets/qsizepolicy.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\hled.o ..\OpenCR_FW_Downloader\hled.cpp
+
+debug/msg.o: ../OpenCR_FW_Downloader/msg/msg.c ../OpenCR_FW_Downloader/msg/msg.h \
+		../OpenCR_FW_Downloader/msg/def.h \
+		../OpenCR_FW_Downloader/msg/def_err.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/version.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/opencr_msg.h \
+		../OpenCR_FW_Downloader/msg/mavlink/protocol.h \
+		../OpenCR_FW_Downloader/msg/mavlink/mavlink_types.h \
+		../OpenCR_FW_Downloader/msg/mavlink/mavlink_helpers.h \
+		../OpenCR_FW_Downloader/msg/mavlink/checksum.h \
+		../OpenCR_FW_Downloader/msg/mavlink/mavlink_conversions.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_ack.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_read_version.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_read_board_name.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_read_tag.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_write_begin.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_write_end.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_write_packet.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_write_block.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_erase.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_verify.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_read_packet.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_flash_fw_read_block.h \
+		../OpenCR_FW_Downloader/msg/mavlink/opencr_msg/mavlink_msg_jump_to_fw.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o debug\msg.o ..\OpenCR_FW_Downloader\msg\msg.c
 
 debug/moc_dialog.o: debug/moc_dialog.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\moc_dialog.o debug\moc_dialog.cpp

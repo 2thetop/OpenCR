@@ -35,12 +35,17 @@ private slots:
     void onClockLabelUpdate();
     void onTextBoxLogPrint(QString str);
     void onPortAddedOrRemoved();
+    void on_sendButton_clicked();
+
 private:
     Ui::Dialog *ui;
     QTimer *timer;
     QTimer *timer_colck;
     QextSerialPort *port;
     QextSerialEnumerator *enumerator;
+
+public:
+
 };
 
 #endif // DIALOG_H
