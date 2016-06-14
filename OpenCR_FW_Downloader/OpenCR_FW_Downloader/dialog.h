@@ -37,6 +37,8 @@ private slots:
     void onPortAddedOrRemoved();
     void on_sendButton_clicked();
 
+    void on_sendButton_3_clicked();
+
 private:
     Ui::Dialog *ui;
     QTimer *timer;

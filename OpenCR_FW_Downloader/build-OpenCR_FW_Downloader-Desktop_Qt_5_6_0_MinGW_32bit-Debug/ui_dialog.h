@@ -53,6 +53,7 @@ public:
     QLabel *label_6;
     QComboBox *queryModeBox;
     QSpacerItem *verticalSpacer;
+    QPushButton *openCloseButton;
     QLabel *label_12;
     QWidget *layoutWidget1;
     QVBoxLayout *verticalLayout_4;
@@ -74,7 +75,6 @@ public:
     QLabel *label_10;
     QSpacerItem *verticalSpacer_2;
     QVBoxLayout *verticalLayout_3;
-    QPushButton *openCloseButton;
     QPushButton *pushButton_LoadFirmware;
     QPushButton *sendButton_3;
     QPushButton *sendButton_2;
@@ -180,6 +180,11 @@ public:
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_2->addItem(verticalSpacer);
+
+        openCloseButton = new QPushButton(layoutWidget);
+        openCloseButton->setObjectName(QStringLiteral("openCloseButton"));
+
+        verticalLayout_2->addWidget(openCloseButton);
 
         label_12 = new QLabel(Dialog);
         label_12->setObjectName(QStringLiteral("label_12"));
@@ -301,11 +306,6 @@ public:
         verticalLayout_3 = new QVBoxLayout();
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
-        openCloseButton = new QPushButton(layoutWidget2);
-        openCloseButton->setObjectName(QStringLiteral("openCloseButton"));
-
-        verticalLayout_3->addWidget(openCloseButton);
-
         pushButton_LoadFirmware = new QPushButton(layoutWidget2);
         pushButton_LoadFirmware->setObjectName(QStringLiteral("pushButton_LoadFirmware"));
 
@@ -349,12 +349,12 @@ public:
         label_7->setText(QApplication::translate("Dialog", "Timeout:", 0));
         timeoutBox->setSuffix(QApplication::translate("Dialog", " ms", 0));
         label_6->setText(QApplication::translate("Dialog", "QueryMode:", 0));
+        openCloseButton->setText(QApplication::translate("Dialog", "Open/Close", 0));
         label_12->setText(QApplication::translate("Dialog", "Status Log :", 0));
         label_8->setText(QApplication::translate("Dialog", "Port On/Off Status", 0));
         label_9->setText(QApplication::translate("Dialog", "Mavlink connection Status", 0));
         label_11->setText(QApplication::translate("Dialog", "TX", 0));
         label_10->setText(QApplication::translate("Dialog", "RX", 0));
-        openCloseButton->setText(QApplication::translate("Dialog", "Open/Close", 0));
         pushButton_LoadFirmware->setText(QApplication::translate("Dialog", "LoadFirmware", 0));
         sendButton_3->setText(QApplication::translate("Dialog", "Erase", 0));
         sendButton_2->setText(QApplication::translate("Dialog", "Verify", 0));

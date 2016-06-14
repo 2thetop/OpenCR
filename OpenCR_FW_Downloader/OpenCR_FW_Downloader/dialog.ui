@@ -136,6 +136,13 @@
       </property>
      </spacer>
     </item>
+    <item>
+     <widget class="QPushButton" name="openCloseButton">
+      <property name="text">
+       <string>Open/Close</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QLabel" name="label_12">
@@ -330,13 +337,6 @@
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <widget class="QPushButton" name="openCloseButton">
-        <property name="text">
-         <string>Open/Close</string>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QPushButton" name="pushButton_LoadFirmware">
         <property name="text">

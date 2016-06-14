@@ -353,20 +353,20 @@ void Dialog::on_sendButton_clicked()
     err_code = cmd_read_board_name( board_str, &board_str_len );
     if( err_code == OK )
     {
-      onTextBoxLogPrint(QString("Board Name : \r\n").insert(13,board_str));
+      onTextBoxLogPrint(QString::sprintf("Board Name : %c\r\n",board_str));
     }
     err_code = cmd_read_version( &board_version, &board_revision );
     if( err_code == OK )
     {
-      onTextBoxLogPrint(QString("Board Ver  : 0x%1\r\n").arg(QString::number(board_version));
-      onTextBoxLogPrint(QString("Board Rev  : 0x%1\r\n").arg(QString::number(board_revision));
+      onTextBoxLogPrint(QString::sprintf("Board Ver  : 0x%08x\r\n",board_version);
+      onTextBoxLogPrint(QString::sprintf("Board Rev  : 0x%08x\r\n",board_revision);
     }
     onTextBoxLogPrint(">>\r\n");
 
     t = iclock();
     ret = opencr_ld_flash_erase(fw_size);
     dt = iclock() - t;
-    printf("flash_erase : %d : %f sec\r\n", ret, GET_CALC_TIME(dt));
+    onTextBoxLogPrint(QString::sprintf("flash_erase : %d : %f sec\r\n", ret, GET_CALC_TIME(dt)));
     if( ret < 0 )
     {
       ser_close( stm32_ser_id );
@@ -905,4 +905,9 @@ static long iclock()
     struct timeval tv;
     gettimeofday (&tv, NULL);
     return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+}
+
+void Dialog::on_sendButton_3_clicked()
+{
+
 }
