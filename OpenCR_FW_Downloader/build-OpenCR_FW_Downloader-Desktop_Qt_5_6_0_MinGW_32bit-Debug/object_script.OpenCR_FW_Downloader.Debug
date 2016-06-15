@@ -6,7 +6,7 @@ INPUT(
 ./debug\main.o
 ./debug\dialog.o
 ./debug\hled.o
-./debug\msg.o
+./debug\opencr_ld.o
 ./debug\moc_dialog.o
 ./debug\moc_hled.o
 );

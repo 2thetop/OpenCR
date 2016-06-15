@@ -75,10 +75,10 @@ public:
     QLabel *label_10;
     QSpacerItem *verticalSpacer_2;
     QVBoxLayout *verticalLayout_3;
-    QPushButton *pushButton_LoadFirmware;
+    QPushButton *LoadFirmwareButton;
     QPushButton *sendButton_3;
     QPushButton *sendButton_2;
-    QPushButton *sendButton;
+    QPushButton *ProgramButton;
     QLabel *label_13;
 
     void setupUi(QDialog *Dialog)
@@ -306,10 +306,10 @@ public:
         verticalLayout_3 = new QVBoxLayout();
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
-        pushButton_LoadFirmware = new QPushButton(layoutWidget2);
-        pushButton_LoadFirmware->setObjectName(QStringLiteral("pushButton_LoadFirmware"));
+        LoadFirmwareButton = new QPushButton(layoutWidget2);
+        LoadFirmwareButton->setObjectName(QStringLiteral("LoadFirmwareButton"));
 
-        verticalLayout_3->addWidget(pushButton_LoadFirmware);
+        verticalLayout_3->addWidget(LoadFirmwareButton);
 
         sendButton_3 = new QPushButton(layoutWidget2);
         sendButton_3->setObjectName(QStringLiteral("sendButton_3"));
@@ -321,10 +321,10 @@ public:
 
         verticalLayout_3->addWidget(sendButton_2);
 
-        sendButton = new QPushButton(layoutWidget2);
-        sendButton->setObjectName(QStringLiteral("sendButton"));
+        ProgramButton = new QPushButton(layoutWidget2);
+        ProgramButton->setObjectName(QStringLiteral("ProgramButton"));
 
-        verticalLayout_3->addWidget(sendButton);
+        verticalLayout_3->addWidget(ProgramButton);
 
 
         verticalLayout_5->addLayout(verticalLayout_3);
@@ -355,10 +355,10 @@ public:
         label_9->setText(QApplication::translate("Dialog", "Mavlink connection Status", 0));
         label_11->setText(QApplication::translate("Dialog", "TX", 0));
         label_10->setText(QApplication::translate("Dialog", "RX", 0));
-        pushButton_LoadFirmware->setText(QApplication::translate("Dialog", "LoadFirmware", 0));
+        LoadFirmwareButton->setText(QApplication::translate("Dialog", "LoadFirmware", 0));
         sendButton_3->setText(QApplication::translate("Dialog", "Erase", 0));
         sendButton_2->setText(QApplication::translate("Dialog", "Verify", 0));
-        sendButton->setText(QApplication::translate("Dialog", "Program", 0));
+        ProgramButton->setText(QApplication::translate("Dialog", "Program", 0));
         label_13->setText(QApplication::translate("Dialog", "localTime", 0));
     } // retranslateUi
 

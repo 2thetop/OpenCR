@@ -338,7 +338,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QPushButton" name="pushButton_LoadFirmware">
+       <widget class="QPushButton" name="LoadFirmwareButton">
         <property name="text">
          <string>LoadFirmware</string>
         </property>
@@ -359,7 +359,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="sendButton">
+       <widget class="QPushButton" name="ProgramButton">
         <property name="text">
          <string>Program</string>
         </property>

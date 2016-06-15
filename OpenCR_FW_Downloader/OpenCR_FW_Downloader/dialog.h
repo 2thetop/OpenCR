@@ -21,7 +21,7 @@ protected:
     void changeEvent(QEvent *e);
 
 private slots:
-    void on_pushButton_LoadFirmware_clicked();
+
     void onPortNameChanged(const QString &name);
     void onBaudRateChanged(int idx);
     void onParityChanged(int idx);
@@ -30,14 +30,14 @@ private slots:
     void onQueryModeChanged(int idx);
     void onTimeoutChanged(int val);
     void onOpenCloseButtonClicked();
-    void onSendButtonClicked();
+
     void onReadyRead();
     void onClockLabelUpdate();
     void onTextBoxLogPrint(QString str);
     void onPortAddedOrRemoved();
-    void on_sendButton_clicked();
 
-    void on_sendButton_3_clicked();
+    void on_ProgramButton_clicked();
+    void on_LoadFirmwareButton_clicked();
 
 private:
     Ui::Dialog *ui;
@@ -47,7 +47,7 @@ private:
     QextSerialEnumerator *enumerator;
 
 public:
-
+    QStringList fileNames;
 };
 
 

@@ -6,7 +6,7 @@ INPUT(
 ./release\main.o
 ./release\dialog.o
 ./release\hled.o
-./release\msg.o
+./release\opencr_ld.o
 ./release\moc_dialog.o
 ./release\moc_hled.o
 );

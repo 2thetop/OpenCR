@@ -15,7 +15,8 @@ include(./qextserialport/qextserialport.pri)
 
 SOURCES += main.cpp\
         dialog.cpp \
-    hled.cpp
+    hled.cpp \
+    opencr_ld.c
 
 HEADERS  += dialog.h \
     hled.h \
@@ -43,7 +44,8 @@ HEADERS  += dialog.h \
     msg/mavlink/protocol.h \
     msg/def.h \
     msg/def_err.h \
-    type.h
+    type.h \
+    opencr_ld.h
 
 
 FORMS    += dialog.ui
