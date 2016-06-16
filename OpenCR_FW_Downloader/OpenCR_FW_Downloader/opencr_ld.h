@@ -9,8 +9,17 @@
 #define __OPENCR_LD_MAIN_H_
 
 #include <unistd.h>
+#include <stdint.h>
 #include "type.h"
+#include "./msg/msg.h"
 //#include "serial.h"
+
+
+#define GET_CALC_TIME(x)	( (int)(x / 1000) + ((float)(x % 1000))/1000 )
+
+#define FLASH_TX_BLOCK_LENGTH	(8*1024)
+#define FLASH_RX_BLOCK_LENGTH	(128)
+#define FLASH_PACKET_LENGTH   	128
 
 
 int opencr_ld_main( int argc, const char **argv );

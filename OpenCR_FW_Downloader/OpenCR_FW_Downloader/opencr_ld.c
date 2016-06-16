@@ -20,13 +20,6 @@ static uint32_t   opencr_fpsize;
 ser_handler stm32_ser_id = ( ser_handler )-1;
 
 
-#define GET_CALC_TIME(x)	( (int)(x / 1000) + ((float)(x % 1000))/1000 )
-
-#define FLASH_TX_BLOCK_LENGTH	(8*1024)
-#define FLASH_RX_BLOCK_LENGTH	(128)
-#define FLASH_PACKET_LENGTH   	128
-
-
 uint32_t tx_buf[768*1024/4];
 uint32_t rx_buf[768*1024/4];
 

@@ -11,29 +11,12 @@
 
 #include "./msg/def.h"
 //#include "./msg/msg.h"
-
-#define FLASH_TX_BLOCK_LENGTH	(8*1024)
-#define FLASH_RX_BLOCK_LENGTH	(128)
-#define FLASH_PACKET_LENGTH   	128
-
-
-uint32_t tx_buf[768*1024/4];
-uint32_t rx_buf[768*1024/4];
-
-static long iclock();
-uint32_t crc_calc( uint32_t crc_in, uint8_t data_in );
-
-err_code_t cmd_read_version( uint32_t *p_version, uint32_t *p_revision );
-err_code_t cmd_read_board_name( uint8_t *p_str, uint8_t *p_len );
-err_code_t cmd_flash_fw_erase( uint32_t length );
-err_code_t cmd_flash_fw_write_begin( void );
-err_code_t cmd_flash_fw_write_end( void );
-err_code_t cmd_flash_fw_write_packet( uint16_t addr, uint8_t *p_data, uint8_t length );
-err_code_t cmd_flash_fw_write_block( uint32_t addr, uint32_t length  );
-err_code_t cmd_flash_fw_send_block_multi( uint8_t block_count );
-err_code_t cmd_flash_fw_read_block( uint32_t addr, uint8_t *p_data, uint16_t length );
-err_code_t cmd_flash_fw_verify( uint32_t length, uint32_t crc, uint32_t *p_crc_ret );
-err_code_t cmd_jump_to_fw(void);
+#include "opencr_ld.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <limits.h>
 
 
 Dialog::Dialog(QWidget *parent) :
@@ -229,7 +212,7 @@ void Dialog::on_LoadFirmwareButton_clicked()
 {
     QFileDialog fileDialog(this,tr("Open File"),
             QCoreApplication::applicationDirPath(),
-            tr("Img(*.hex *.bin)"));
+            tr("Img(*.bin)"));
 
 
     if(fileDialog.exec()){
@@ -319,8 +302,142 @@ void Dialog::onTextBoxLogPrint(QString str)
   //  ui->textEdit_Log->append(str);
 
 }
+
+static FILE      *opencr_fp;
+static uint32_t   opencr_fpsize;
+extern ser_handler stm32_ser_id;
 void Dialog::on_ProgramButton_clicked()
 {
-    //opencr_ld_down( int argc, const char **argv );
+    int i;
+    int j;
+    int ret = 0;
+    err_code_t err_code = OK;
+    long t, dt;
+    float calc_time;
+    uint32_t fw_size = 256*1024*3;
+    uint8_t  board_str[16];
+    uint8_t  board_str_len;
+    uint32_t board_version;
+    uint32_t board_revision;
+    uint32_t crc;
+    uint32_t crc_ret = 0;
+    uint8_t  *p_buf_crc;
+    char *portname;
+    char *filename;
+    uint32_t baud;
+    uint8_t  block_buf[FLASH_TX_BLOCK_LENGTH];
+    uint32_t addr;
+    uint32_t len;
 
+    baud     = (uint32_t)port->baudRate();
+    //QString --> QByteArray --> const char*
+
+    QString strportName = port->portName();
+    QByteArray ba = strportName.toLatin1();
+    portname = ba.data();
+
+    QString selectedFile;
+    for(int nIndex=0; nIndex < fileNames.size(); nIndex++)
+    {
+        selectedFile.append(fileNames.at(nIndex).toLocal8Bit().constData());
+    }
+    QByteArray bafilename = selectedFile.toLatin1();
+    filename = ba.data();
+
+  if( ( opencr_fp = fopen(filename, "rb" ) ) == NULL )
+  {
+    fprintf( stderr, "Unable to open %s\n",filename);
+    exit( 1 );
+  }
+  else
+  {
+    fseek( opencr_fp, 0, SEEK_END );
+    opencr_fpsize = ftell( opencr_fp );
+    fseek( opencr_fp, 0, SEEK_SET );
+    printf(">>\r\n");
+    printf("file name : %s \r\n", filename);
+    printf("file size : %d KB\r\n", opencr_fpsize/1024);
+  }
+
+  fw_size = opencr_fpsize;
+
+
+
+  // Open port
+  if (!port->isOpen()) {
+      port->setPortName(ui->portBox->currentText());
+      port->open(QIODevice::ReadWrite);
+  }
+
+  printf(">>\r\n");
+  err_code = cmd_read_board_name( board_str, &board_str_len );
+  if( err_code == OK )
+  {
+    printf("Board Name : %s\r\n", board_str);
+  }
+  err_code = cmd_read_version( &board_version, &board_revision );
+  if( err_code == OK )
+  {
+    printf("Board Ver  : 0x%08X\r\n", board_version);
+    printf("Board Rev  : 0x%08X\r\n", board_revision);
+  }
+  printf(">>\r\n");
+
+  t = iclock();
+  ret = opencr_ld_flash_erase(fw_size);
+  dt = iclock() - t;
+  printf("flash_erase : %d : %f sec\r\n", ret, GET_CALC_TIME(dt));
+  if( ret < 0 )
+  {
+    port->close();
+    fclose( opencr_fp );
+    exit(1);
+  }
+
+  t = iclock();
+  crc  = 0;
+  addr = 0;
+  while(1)
+  {
+    len = opencr_ld_file_read_data( block_buf, FLASH_TX_BLOCK_LENGTH);
+    if( len == 0 ) break;
+
+    for( i=0; i<len; i++ )
+    {
+      crc = crc_calc( crc,  block_buf[i] );
+    }
+
+    ret = opencr_ld_flash_write( addr, block_buf, len );
+    if( ret < 0 ) break;
+    addr += len;
+  }
+  dt = iclock() - t;
+
+  printf("flash_write : %d : %f sec \r\n", ret,  GET_CALC_TIME(dt));
+  if( ret < 0 )
+  {
+    port->close();
+    fclose( opencr_fp );
+    return;
+  }
+
+  t = iclock();
+  err_code = cmd_flash_fw_verify( fw_size, crc, &crc_ret );
+  dt = iclock() - t;
+  if( err_code == OK )
+  {
+    printf("CRC OK %X %X %f sec\r\n", crc, crc_ret, GET_CALC_TIME(dt));
+  }
+  else
+  {
+    printf("CRC Fail : 0x%X : %X, %X %f sec\r\n", err_code, crc, crc_ret, GET_CALC_TIME(dt));
+  }
+
+  printf("jump_to_fw \r\n");
+  cmd_jump_to_fw();
+
+  port->close();
+  fclose( opencr_fp );
+
+  return;
 }
