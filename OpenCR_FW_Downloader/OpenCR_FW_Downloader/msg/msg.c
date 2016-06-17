@@ -12,14 +12,12 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "../serial.h"
+//#include "../serial.h"
 
 
 extern ser_handler stm32_ser_id;
 extern int read_byte( void );
 extern int write_bytes( char *p_data, int len );
-
-
 
 void msg_init(void)
 {

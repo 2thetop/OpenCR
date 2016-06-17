@@ -9,15 +9,12 @@
 #include <QMessageBox>
 #include <QDebug>
 
-#include "./msg/def.h"
-//#include "./msg/msg.h"
-#include "opencr_ld.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
-
+#include <sys/time.h>
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -98,6 +95,8 @@ Dialog::Dialog(QWidget *parent) :
     QDateTime local(QDateTime::currentDateTime());
     ui->label_13->setText(local.toString());
 
+    ui->progressBar_Status->setValue(100);
+
     setWindowTitle("OpenCR Firmware Downloader v1.0");
 }
 
@@ -158,12 +157,24 @@ void Dialog::onTimeoutChanged(int val)
 //! [3]
 void Dialog::onOpenCloseButtonClicked()
 {
-    if (!port->isOpen()) {
-        port->setPortName(ui->portBox->currentText());
-        port->open(QIODevice::ReadWrite);
+    if (!port->isOpen())
+    {
+        if(ui->portBox->currentText() != NULL )
+        {
+            port->setPortName(ui->portBox->currentText());
+            port->open(QIODevice::ReadWrite);
+
+            onTextBoxLogPrint("Opened "+port->portName()+"\r\n");
+        }
+        else
+        {
+            onTextBoxLogPrint("There is no serial device..\r\n");
+        }
     }
-    else {
+    else
+    {
         port->close();
+        onTextBoxLogPrint("Colsed "+port->portName()+"\r\n");
     }
 
     //If using polling mode, we need a QTimer
@@ -214,7 +225,7 @@ void Dialog::on_LoadFirmwareButton_clicked()
             QCoreApplication::applicationDirPath(),
             tr("Img(*.bin)"));
 
-
+    //fileNames = NULL;
     if(fileDialog.exec()){
         fileNames = fileDialog.selectedFiles();
     }
@@ -226,14 +237,14 @@ void Dialog::on_LoadFirmwareButton_clicked()
 
     //QTextCodec *textCodec = QTextCodec::codecForName("eucKR");
    // ui->textEdit_Log->setText(selectedFile.toUtf8());
-    onTextBoxLogPrint(selectedFile.toUtf8());
+    onTextBoxLogPrint(selectedFile.toUtf8()+"\r\n");
 
     QFile file(selectedFile.toUtf8());
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
         QMessageBox::information(0,"error",file.errorString());
+        return;
     }
-
-
 
     //QDataStream dataStreamReader(&file);
     //dataStreamReader >> ba;
@@ -246,8 +257,9 @@ void Dialog::on_LoadFirmwareButton_clicked()
        // ui->progressBar_Status->setValue(100*line.count()*line.size());
    // }
 
+    QString textPrint;
     int file_size = file.size();
-    onTextBoxLogPrint(QString("file size : %1 bytes").arg(QString::number(file_size)));
+    onTextBoxLogPrint(textPrint.sprintf("file size : %d bytes\r\n",file_size));
     ui->tb_hexview->setRowCount((file_size/16) +1);
     ui->tb_hexview->setColumnCount(4);
 
@@ -276,36 +288,19 @@ void Dialog::on_LoadFirmwareButton_clicked()
 
         if(49152<index)
         {
-            qDebug()<< index << tmpstr;
+            //qDebug()<< index << tmpstr;
         }
         ui->tb_hexview->setItem((index/4)/4, (index/4)%4, new QTableWidgetItem(tmpstr.toUpper()));
+
+        ui->progressBar_Status->setValue(100*(index+4)/file_size);
 
     }
 
     file.close();
 }
 
-void Dialog::onTextBoxLogPrint(QString str)
-{
-    QDateTime local(QDateTime::currentDateTime());
-
-    ui->textEdit_Log->setTextColor(QColor(0x00,0x00,0x97));
-    ui->textEdit_Log->insertPlainText("\r\n"+local.toString()+" : ");
-
-//ui->textEdit_Log->textCursor().deletePreviousChar();
-    ui->textEdit_Log->moveCursor (QTextCursor::End);
-    ui->textEdit_Log->setTextColor(QColor(0x00,0x00,0x00));
-    ui->textEdit_Log->insertPlainText(str);
-    ui->textEdit_Log->moveCursor (QTextCursor::End);
-
-
-  //  ui->textEdit_Log->append(str);
-
-}
-
 static FILE      *opencr_fp;
 static uint32_t   opencr_fpsize;
-extern ser_handler stm32_ser_id;
 void Dialog::on_ProgramButton_clicked()
 {
     int i;
@@ -336,57 +331,58 @@ void Dialog::on_ProgramButton_clicked()
     QByteArray ba = strportName.toLatin1();
     portname = ba.data();
 
+    // Open port
+    if (!port->isOpen())
+    {
+        onTextBoxLogPrint("serial port is not opened\r\n");
+        return;
+    }
+
     QString selectedFile;
     for(int nIndex=0; nIndex < fileNames.size(); nIndex++)
     {
         selectedFile.append(fileNames.at(nIndex).toLocal8Bit().constData());
     }
     QByteArray bafilename = selectedFile.toLatin1();
-    filename = ba.data();
+    filename = bafilename.data();
 
-  if( ( opencr_fp = fopen(filename, "rb" ) ) == NULL )
-  {
-    fprintf( stderr, "Unable to open %s\n",filename);
-    exit( 1 );
-  }
-  else
-  {
-    fseek( opencr_fp, 0, SEEK_END );
-    opencr_fpsize = ftell( opencr_fp );
-    fseek( opencr_fp, 0, SEEK_SET );
-    printf(">>\r\n");
-    printf("file name : %s \r\n", filename);
-    printf("file size : %d KB\r\n", opencr_fpsize/1024);
-  }
-
+    QString textPrint;
+    if( ( opencr_fp = fopen(filename, "rb" ) ) == NULL )
+    {
+        onTextBoxLogPrint(textPrint.sprintf("Failed to open file : %s\r\n",filename));
+        return;
+        //exit( 1 );
+    }
+    else
+    {
+        fseek( opencr_fp, 0, SEEK_END );
+        opencr_fpsize = ftell( opencr_fp );
+        fseek( opencr_fp, 0, SEEK_SET );
+        onTextBoxLogPrint(">>\r\n");
+        onTextBoxLogPrint(textPrint.sprintf("file name : %s \r\n", filename));
+        onTextBoxLogPrint(textPrint.sprintf("file size : %d KB\r\n", opencr_fpsize/1024));
+    }
+return;
   fw_size = opencr_fpsize;
 
-
-
-  // Open port
-  if (!port->isOpen()) {
-      port->setPortName(ui->portBox->currentText());
-      port->open(QIODevice::ReadWrite);
-  }
-
-  printf(">>\r\n");
+  onTextBoxLogPrint(textPrint.sprintf(">>\r\n"));
   err_code = cmd_read_board_name( board_str, &board_str_len );
   if( err_code == OK )
   {
-    printf("Board Name : %s\r\n", board_str);
+    onTextBoxLogPrint(textPrint.sprintf("Board Name : %s\r\n", board_str));
   }
   err_code = cmd_read_version( &board_version, &board_revision );
   if( err_code == OK )
   {
-    printf("Board Ver  : 0x%08X\r\n", board_version);
-    printf("Board Rev  : 0x%08X\r\n", board_revision);
+    onTextBoxLogPrint(textPrint.sprintf("Board Ver  : 0x%08X\r\n", board_version));
+    onTextBoxLogPrint(textPrint.sprintf("Board Rev  : 0x%08X\r\n", board_revision));
   }
-  printf(">>\r\n");
+ onTextBoxLogPrint(">>\r\n");
 
   t = iclock();
   ret = opencr_ld_flash_erase(fw_size);
   dt = iclock() - t;
-  printf("flash_erase : %d : %f sec\r\n", ret, GET_CALC_TIME(dt));
+  onTextBoxLogPrint(textPrint.sprintf("flash_erase : %d : %f sec\r\n", ret, GET_CALC_TIME(dt)));
   if( ret < 0 )
   {
     port->close();
@@ -413,7 +409,7 @@ void Dialog::on_ProgramButton_clicked()
   }
   dt = iclock() - t;
 
-  printf("flash_write : %d : %f sec \r\n", ret,  GET_CALC_TIME(dt));
+ onTextBoxLogPrint(textPrint.sprintf("flash_write : %d : %f sec \r\n", ret,  GET_CALC_TIME(dt)));
   if( ret < 0 )
   {
     port->close();
@@ -426,14 +422,14 @@ void Dialog::on_ProgramButton_clicked()
   dt = iclock() - t;
   if( err_code == OK )
   {
-    printf("CRC OK %X %X %f sec\r\n", crc, crc_ret, GET_CALC_TIME(dt));
+    onTextBoxLogPrint(textPrint.sprintf("CRC OK %X %X %f sec\r\n", crc, crc_ret, GET_CALC_TIME(dt)));
   }
   else
   {
-    printf("CRC Fail : 0x%X : %X, %X %f sec\r\n", err_code, crc, crc_ret, GET_CALC_TIME(dt));
+    onTextBoxLogPrint(textPrint.sprintf("CRC Fail : 0x%X : %X, %X %f sec\r\n", err_code, crc, crc_ret, GET_CALC_TIME(dt)));
   }
 
-  printf("jump_to_fw \r\n");
+  onTextBoxLogPrint(textPrint.sprintf("jump_to_fw \r\n"));
   cmd_jump_to_fw();
 
   port->close();
@@ -441,3 +437,828 @@ void Dialog::on_ProgramButton_clicked()
 
   return;
 }
+
+//==================================================================
+//member functions
+
+void Dialog::onTextBoxLogPrint(QString str)
+{
+    QDateTime local(QDateTime::currentDateTime());
+
+    ui->textEdit_Log->setTextColor(QColor(0x00,0x00,0x97));
+    ui->textEdit_Log->insertPlainText("-"+local.toString("hh:mm:ss A")+" : ");
+
+//ui->textEdit_Log->textCursor().deletePreviousChar();
+    ui->textEdit_Log->moveCursor (QTextCursor::End);
+    ui->textEdit_Log->setTextColor(QColor(0x00,0x00,0x00));
+    ui->textEdit_Log->insertPlainText(str);
+    ui->textEdit_Log->moveCursor (QTextCursor::End);
+
+
+  //  ui->textEdit_Log->append(str);
+
+}
+
+/*---------------------------------------------------------------------------
+     TITLE   : opencr_ld_file_read_data
+     WORK    :
+---------------------------------------------------------------------------*/
+uint32_t Dialog::opencr_ld_file_read_data( uint8_t *dst, uint32_t len )
+{
+  size_t readbytes = 0;
+
+  if( !feof( opencr_fp ) )
+  {
+    readbytes = fread( dst, 1, len, opencr_fp );
+  }
+  return ( uint32_t )readbytes;
+}
+
+/*---------------------------------------------------------------------------
+     TITLE   : opencr_ld_flash_write
+     WORK    :
+---------------------------------------------------------------------------*/
+int Dialog::opencr_ld_flash_write( uint32_t addr, uint8_t *p_data, uint32_t length  )
+{
+  int ret = 0;
+  err_code_t err_code = OK;
+  uint32_t block_length;
+  uint16_t block_cnt;
+  uint32_t written_packet_length;
+  uint32_t written_total_length;
+  uint32_t packet_length = 128;
+  uint32_t i;
+
+
+  err_code = cmd_flash_fw_write_begin();
+  if( err_code != OK )
+  {
+    printf("cmd_flash_fw_write_begin ERR : 0x%04X\r\n", err_code);
+    return -1;
+  }
+
+  written_total_length = 0;
+
+  while(1)
+  {
+    block_length = length - written_total_length;
+
+    if( block_length > FLASH_TX_BLOCK_LENGTH )
+    {
+      block_length = FLASH_TX_BLOCK_LENGTH;
+    }
+
+    block_cnt = block_length/FLASH_PACKET_LENGTH;
+    if( block_length%FLASH_PACKET_LENGTH > 0 )
+    {
+      block_cnt += 1;
+    }
+
+
+    written_packet_length = 0;
+    for( i=0; i<block_cnt; i++ )
+    {
+      packet_length = block_length - written_packet_length;
+      if( packet_length > FLASH_PACKET_LENGTH )
+      {
+    packet_length = FLASH_PACKET_LENGTH;
+      }
+
+      err_code = cmd_flash_fw_write_packet(written_packet_length, &p_data[written_total_length+written_packet_length], packet_length);
+      if( err_code != OK )
+      {
+    printf("cmd_flash_fw_send_block ERR : 0x%04X\r\n", err_code);
+    return -2;
+      }
+
+      written_packet_length += packet_length;
+    }
+
+    //printf("%d : %d, %d, %d \r\n", written_packet_length, block_length, block_cnt, packet_length);
+
+    if( written_packet_length == block_length )
+    {
+      err_code = cmd_flash_fw_write_block(addr+written_total_length, block_length);
+      if( err_code != OK )
+      {
+    printf("cmd_flash_fw_write_block ERR : 0x%04X\r\n", err_code);
+    return -3;
+      }
+    }
+    else
+    {
+      printf("written_packet_length : %d, %d 0x%04X\r\n", written_packet_length, block_length, err_code);
+      return -4;
+    }
+
+    written_total_length += block_length;
+
+    if( written_total_length == length )
+    {
+      break;
+    }
+    else if( written_total_length > length )
+    {
+      printf("written_total_length over \r\n");
+      return -5;
+    }
+  }
+
+
+  cmd_flash_fw_write_end();
+
+  return ret;
+}
+
+/*---------------------------------------------------------------------------
+     TITLE   : opencr_ld_flash_read
+     WORK    :
+---------------------------------------------------------------------------*/
+int Dialog::opencr_ld_flash_read( uint32_t addr, uint8_t *p_data, uint32_t length  )
+{
+  int ret = 0;
+  err_code_t err_code = OK;
+  uint32_t block_length;
+  uint32_t read_packet_length;
+  uint32_t read_total_length;
+  int i;
+  int err_count = 0;
+
+  read_total_length = 0;
+
+  while(1)
+  {
+    block_length = length - read_total_length;
+
+    if( block_length > FLASH_PACKET_LENGTH )
+    {
+      block_length = FLASH_PACKET_LENGTH;
+    }
+
+
+    for( i=0; i<3; i++ )
+    {
+      err_code = cmd_flash_fw_read_block( addr+read_total_length, &p_data[read_total_length], block_length );
+      if( err_code == OK ) break;
+      err_count++;
+    }
+
+
+    if( err_code != OK )
+    {
+      printf("cmd_flash_fw_read_block : addr:%X, 0x%04X \r\n", addr+read_total_length, err_code);
+      return -1;
+    }
+
+    read_total_length += block_length;
+
+    if( read_total_length == length )
+    {
+      break;
+    }
+    else if( read_total_length > length )
+    {
+      printf("read_total_length over \r\n");
+      return -2;
+    }
+  }
+
+  return ret;
+}
+
+/*---------------------------------------------------------------------------
+     TITLE   : opencr_ld_flash_erase
+     WORK    :
+---------------------------------------------------------------------------*/
+int Dialog::opencr_ld_flash_erase( uint32_t length  )
+{
+  int ret = 0;
+  err_code_t err_code = OK;
+
+  err_code = cmd_flash_fw_erase( length );
+
+  if( err_code != OK )
+  {
+    printf("cmd_flash_fw_erase_block : 0x%04X %d\r\n", err_code, length );
+    return -1;
+  }
+
+  return ret;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_read_version
+     WORK    :
+---------------------------------------------------------------------------*/
+err_code_t Dialog::cmd_read_version( uint32_t *p_version, uint32_t *p_revision )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_ack_t     ack_msg;
+  uint8_t param[8];
+  uint8_t resp = 1;
+
+
+  mavlink_msg_read_version_pack(0, 0, &tx_msg, resp, param);
+  msg_send(0, &tx_msg);
+
+  if( resp == 1 )
+  {
+    if( msg_get_resp(0, &rx_msg, 500) == TRUE )
+    {
+      mavlink_msg_ack_decode( &rx_msg, &ack_msg);
+
+      //printf("BootVersion : 0x%08X\r\n", ack_msg.data[3]<<24|ack_msg.data[2]<<16|ack_msg.data[1]<<8|ack_msg.data[0]);
+      *p_version  = ack_msg.data[3]<<24|ack_msg.data[2]<<16|ack_msg.data[1]<<8|ack_msg.data[0];
+      *p_revision = ack_msg.data[7]<<24|ack_msg.data[6]<<16|ack_msg.data[5]<<8|ack_msg.data[4];
+      if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
+      else                                 err_code = ERR_MISMATCH_ID;
+    }
+    else
+    {
+      err_code = ERR_TIMEOUT;
+    }
+  }
+
+  return OK;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_read_board_name
+     WORK    :
+---------------------------------------------------------------------------*/
+err_code_t Dialog::cmd_read_board_name( uint8_t *p_str, uint8_t *p_len )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_ack_t     ack_msg;
+  uint8_t param[8];
+  uint8_t resp = 1;
+
+
+  mavlink_msg_read_board_name_pack(0, 0, &tx_msg, resp, param);
+  msg_send(0, &tx_msg);
+
+  if( resp == 1 )
+  {
+    if( msg_get_resp(0, &rx_msg, 500) == TRUE )
+    {
+      mavlink_msg_ack_decode( &rx_msg, &ack_msg);
+
+      *p_len = ack_msg.length;
+      memcpy(p_str, ack_msg.data, ack_msg.length);
+      p_str[ack_msg.length] = 0;
+
+      if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
+      else                                 err_code = ERR_MISMATCH_ID;
+    }
+    else
+    {
+      err_code = ERR_TIMEOUT;
+    }
+  }
+
+  return OK;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_flash_fw_erase
+     WORK    :
+---------------------------------------------------------------------------*/
+err_code_t Dialog::cmd_flash_fw_erase( uint32_t length )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_ack_t     ack_msg;
+  uint8_t param[8];
+  uint8_t resp = 1;
+
+
+  mavlink_msg_flash_fw_erase_pack(0, 0, &tx_msg, resp, length, param);
+  msg_send(0, &tx_msg);
+
+  if( resp == 1 )
+  {
+    if( msg_get_resp(0, &rx_msg, 3000) == TRUE )
+    {
+      mavlink_msg_ack_decode( &rx_msg, &ack_msg);
+
+      if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
+      else                                 err_code = ERR_MISMATCH_ID;
+    }
+    else
+    {
+      err_code = ERR_TIMEOUT;
+    }
+  }
+
+  return err_code;
+}
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_flash_fw_write_begin
+     WORK    :
+---------------------------------------------------------------------------*/
+err_code_t Dialog::cmd_flash_fw_write_begin( void )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_ack_t     ack_msg;
+  uint8_t param[8];
+  uint8_t resp = 1;
+
+
+  mavlink_msg_flash_fw_write_begin_pack(0, 0, &tx_msg, resp, param);
+  msg_send(0, &tx_msg);
+
+  if( resp == 1 )
+  {
+    if( msg_get_resp(0, &rx_msg, 500) == TRUE )
+    {
+      mavlink_msg_ack_decode( &rx_msg, &ack_msg);
+
+      if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
+      else                                 err_code = ERR_MISMATCH_ID;
+    }
+    else
+    {
+      err_code = ERR_TIMEOUT;
+    }
+  }
+
+  return err_code;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_flash_fw_write_end
+     WORK    :
+---------------------------------------------------------------------------*/
+err_code_t Dialog::cmd_flash_fw_write_end( void )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_ack_t     ack_msg;
+  uint8_t param[8];
+  uint8_t resp = 1;
+
+
+  mavlink_msg_flash_fw_write_end_pack(0, 0, &tx_msg, resp, param);
+  msg_send(0, &tx_msg);
+
+  if( resp == 1 )
+  {
+    if( msg_get_resp(0, &rx_msg, 500) == TRUE )
+    {
+      mavlink_msg_ack_decode( &rx_msg, &ack_msg);
+
+      //printf("block_count  : %d\r\n", ack_msg.data[1]<<8|ack_msg.data[0]);
+      //printf("block_length : %d\r\n", ack_msg.data[5]<<24|ack_msg.data[4]<<16|ack_msg.data[3]<<8|ack_msg.data[2]);
+
+
+      if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
+      else                                 err_code = ERR_MISMATCH_ID;
+    }
+    else
+    {
+      err_code = ERR_TIMEOUT;
+    }
+  }
+
+  return err_code;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_flash_fw_write_packet
+     WORK    :
+---------------------------------------------------------------------------*/
+err_code_t Dialog::cmd_flash_fw_write_packet( uint16_t addr, uint8_t *p_data, uint8_t length )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_ack_t     ack_msg;
+  uint8_t resp = 0;
+
+
+
+  mavlink_msg_flash_fw_write_packet_pack(0, 0, &tx_msg, resp, addr, length, p_data);
+  msg_send(0, &tx_msg);
+
+
+  if( resp == 1 )
+  {
+    if( msg_get_resp(0, &rx_msg, 500) == TRUE )
+    {
+      mavlink_msg_ack_decode( &rx_msg, &ack_msg);
+
+      if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
+      else                                 err_code = ERR_MISMATCH_ID;
+    }
+    else
+    {
+      err_code = ERR_TIMEOUT;
+    }
+  }
+
+  return err_code;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_flash_fw_send_block_multi
+     WORK    :
+---------------------------------------------------------------------------*/
+err_code_t Dialog::cmd_flash_fw_send_block_multi( uint8_t block_count )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_ack_t     ack_msg;
+  uint8_t buf[256];
+  uint8_t tx_buf[16*1024];
+  uint8_t resp = 0;
+  uint8_t i;
+  uint32_t len;
+
+
+   len = 0;
+  for( i=0; i<block_count; i++ )
+  {
+    mavlink_msg_flash_fw_write_packet_pack(0, 0, &tx_msg, resp, 0, 128, buf);
+    len += mavlink_msg_to_send_buffer(&tx_buf[len], &tx_msg);
+  }
+  write_bytes((char *)tx_buf, len);
+
+  return err_code;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_flash_fw_write_block
+     WORK    :
+---------------------------------------------------------------------------*/
+err_code_t Dialog::cmd_flash_fw_write_block( uint32_t addr, uint32_t length  )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_ack_t     ack_msg;
+  uint8_t buf[256];
+  uint8_t resp = 1;
+
+
+  mavlink_msg_flash_fw_write_block_pack(0, 0, &tx_msg, resp, addr, length);
+  msg_send(0, &tx_msg);
+
+
+  if( resp == 1 )
+  {
+    if( msg_get_resp(0, &rx_msg, 500) == TRUE )
+    {
+      mavlink_msg_ack_decode( &rx_msg, &ack_msg);
+
+      if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
+      else                                 err_code = ERR_MISMATCH_ID;
+    }
+    else
+    {
+      err_code = ERR_TIMEOUT;
+    }
+  }
+
+  return err_code;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_flash_fw_read_block
+     WORK    :
+---------------------------------------------------------------------------*/
+#if 0
+err_code_t Dialog::cmd_flash_fw_read_block( uint32_t addr, uint8_t *p_data, uint16_t length )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_flash_fw_read_t  resp_msg;
+  uint8_t resp = 1;
+  uint16_t received_length;
+
+
+  mavlink_msg_flash_fw_read_block_pack(0, 0, &tx_msg, resp, addr, length);
+  msg_send(0, &tx_msg);
+
+
+
+  if( resp == 1 )
+  {
+    received_length = 0;
+
+    while(1)
+    {
+      if( msg_get_resp(0, &rx_msg, 3000) == TRUE )
+      {
+    mavlink_msg_flash_fw_read_decode( &rx_msg, &resp_msg);
+
+    memcpy(&p_data[received_length], resp_msg.data, resp_msg.length);
+    received_length += resp_msg.length;
+
+    //printf("recv %d \r\n", received_length);
+
+    if( received_length == length )
+    {
+      break;
+    }
+    else if( received_length > length )
+    {
+      err_code = ERR_SIZE_OVER;
+      break;
+    }
+      }
+      else
+      {
+    err_code = ERR_TIMEOUT;
+    break;
+      }
+    }
+  }
+
+  return err_code;
+}
+#else
+err_code_t Dialog::cmd_flash_fw_read_block( uint32_t addr, uint8_t *p_data, uint16_t length )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_flash_fw_read_packet_t  resp_msg;
+  uint8_t resp = 1;
+
+
+  mavlink_msg_flash_fw_read_block_pack(0, 0, &tx_msg, resp, addr, length);
+  msg_send(0, &tx_msg);
+
+
+
+  if( resp == 1 )
+  {
+    if( msg_get_resp(0, &rx_msg, 100) == TRUE )
+    {
+      mavlink_msg_flash_fw_read_packet_decode( &rx_msg, &resp_msg);
+
+      memcpy(p_data, resp_msg.data, resp_msg.length);
+
+      if( resp_msg.length > length )
+      {
+    err_code = ERR_SIZE_OVER;
+      }
+    }
+    else
+    {
+      err_code = ERR_TIMEOUT;
+    }
+  }
+
+  return err_code;
+}
+#endif
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_flash_fw_verify
+     WORK    :
+---------------------------------------------------------------------------*/
+err_code_t Dialog::cmd_flash_fw_verify( uint32_t length, uint32_t crc, uint32_t *p_crc_ret )
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_ack_t     ack_msg;
+  uint8_t param[8];
+  uint8_t resp = 1;
+
+
+  mavlink_msg_flash_fw_verify_pack(0, 0, &tx_msg, resp, length, crc, param);
+  msg_send(0, &tx_msg);
+
+
+  if( resp == 1 )
+  {
+    if( msg_get_resp(0, &rx_msg, 500) == TRUE )
+    {
+      mavlink_msg_ack_decode( &rx_msg, &ack_msg);
+
+      *p_crc_ret = ack_msg.data[3]<<24|ack_msg.data[2]<<16|ack_msg.data[1]<<8|ack_msg.data[0];
+
+      if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
+      else                                 err_code = ERR_MISMATCH_ID;
+    }
+    else
+    {
+      err_code = ERR_TIMEOUT;
+    }
+  }
+  return err_code;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : cmd_jump_to_fw
+     WORK    :
+---------------------------------------------------------------------------*/
+err_code_t Dialog::cmd_jump_to_fw(void)
+{
+  err_code_t err_code = OK;
+  mavlink_message_t tx_msg;
+  mavlink_message_t rx_msg;
+  mavlink_ack_t     ack_msg;
+  uint8_t param[8];
+  uint8_t resp = 0;
+
+
+  mavlink_msg_jump_to_fw_pack(0, 0, &tx_msg, resp, param);
+  msg_send(0, &tx_msg);
+
+
+  if( resp == 1 )
+  {
+    if( msg_get_resp(0, &rx_msg, 500) == TRUE )
+    {
+      mavlink_msg_ack_decode( &rx_msg, &ack_msg);
+
+      if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
+      else                                 err_code = ERR_MISMATCH_ID;
+    }
+    else
+    {
+      err_code = ERR_TIMEOUT;
+    }
+  }
+  return err_code;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : crc_calc
+     WORK    :
+---------------------------------------------------------------------------*/
+uint32_t Dialog::crc_calc( uint32_t crc_in, uint8_t data_in )
+{
+
+  crc_in  ^= data_in;
+  crc_in  += data_in;
+
+  return crc_in;
+}
+
+
+
+
+void Dialog::msg_send(uint8_t chan, mavlink_message_t *p_msg)
+{
+  uint8_t  buf[1024];
+  uint16_t len;
+  uint16_t write_len;
+
+  len = mavlink_msg_to_send_buffer(buf, p_msg);
+
+  switch(chan)
+  {
+    case 0:
+      write_len = write_bytes((char *)buf, (uint32_t)len);
+      if( write_len != len ) printf("wlen %d : len %d\r\n", write_len, len);
+      break;
+
+    case 1:
+      break;
+  }
+}
+
+
+BOOL Dialog::msg_recv( uint8_t chan, uint8_t data , mavlink_message_t *p_msg, mavlink_status_t *p_status )
+{
+  BOOL ret = FALSE;
+
+if (mavlink_parse_char(MAVLINK_COMM_0, data, p_msg, p_status) == MAVLINK_FRAMING_OK)
+{
+  ret = TRUE;
+}
+
+  return ret;
+}
+
+
+BOOL Dialog::msg_get_resp( uint8_t chan, mavlink_message_t *p_msg, uint32_t timeout)
+{
+  BOOL ret = FALSE;
+  int  ch_ret;
+  uint8_t ch;
+  static mavlink_message_t msg[MSG_CH_MAX];
+  static mavlink_status_t status[MSG_CH_MAX];
+  uint32_t retry = timeout;
+
+
+  ser_set_timeout_ms( 1 );
+
+  while(1)
+  {
+    ch_ret = read_byte();
+
+    if( ch_ret < 0 )
+    {
+        if( retry-- <= 0 )
+        {
+            ret = FALSE;
+
+            break;
+        }
+        else
+        {
+            continue;
+        }
+    }
+    else
+    {
+      ch = (uint8_t)(ch_ret);
+      retry = timeout;
+    }
+
+    ret = msg_recv( chan, ch, &msg[chan], &status[chan] );
+
+    if( ret == TRUE )
+    {
+        ui->led_MavlinkStatus->turnOn();
+        *p_msg = msg[chan];
+        break;
+    }
+    else
+    {
+        ui->led_MavlinkStatus->turnOff();
+    }
+  }
+
+  return ret;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : read_byte
+     WORK    :
+---------------------------------------------------------------------------*/
+void Dialog::ser_set_timeout_ms(long val )
+{
+    port->setTimeout(val);
+
+    return;
+}
+
+/*---------------------------------------------------------------------------
+     TITLE   : read_byte
+     WORK    :
+---------------------------------------------------------------------------*/
+int Dialog::read_byte( void )
+{
+    //return ser_read_byte( stm32_ser_id );
+    char byte;
+    ui->led_Rx->turnOn();
+    port->read(&byte,1);
+    ui->led_Rx->turnOff();
+    return (int)byte;
+}
+
+
+/*---------------------------------------------------------------------------
+     TITLE   : write_bytes
+     WORK    :
+---------------------------------------------------------------------------*/
+int Dialog::write_bytes( char *p_data, int len )
+{
+    int written_len;
+    ui->led_Tx->turnOn();
+    //written_len = ser_write( stm32_ser_id, (const u8 *)p_data, len );
+    written_len = port->write(p_data,len);
+    ui->led_Tx->turnOff();
+    return written_len;
+}
+
+long Dialog::iclock()
+{
+   // struct timeval tv;
+   // gettimeofday (&tv, NULL);
+   // return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+
+    QDateTime local(QDateTime::currentDateTime());
+    return local.toMSecsSinceEpoch();
+
+}
+
