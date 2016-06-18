@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Dialog_t {
     QByteArrayData data[20];
-    char stringdata0[299];
+    char stringdata0[336];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -44,11 +44,11 @@ QT_MOC_LITERAL(11, 141, 3), // "val"
 QT_MOC_LITERAL(12, 145, 24), // "onOpenCloseButtonClicked"
 QT_MOC_LITERAL(13, 170, 11), // "onReadyRead"
 QT_MOC_LITERAL(14, 182, 18), // "onClockLabelUpdate"
-QT_MOC_LITERAL(15, 201, 17), // "onTextBoxLogPrint"
-QT_MOC_LITERAL(16, 219, 3), // "str"
-QT_MOC_LITERAL(17, 223, 20), // "onPortAddedOrRemoved"
-QT_MOC_LITERAL(18, 244, 24), // "on_ProgramButton_clicked"
-QT_MOC_LITERAL(19, 269, 29) // "on_LoadFirmwareButton_clicked"
+QT_MOC_LITERAL(15, 201, 20), // "onPortAddedOrRemoved"
+QT_MOC_LITERAL(16, 222, 24), // "on_ProgramButton_clicked"
+QT_MOC_LITERAL(17, 247, 29), // "on_LoadFirmwareButton_clicked"
+QT_MOC_LITERAL(18, 277, 27), // "on_bn_ReadBoardName_clicked"
+QT_MOC_LITERAL(19, 305, 30) // "on_bn_ReadBoardVersion_clicked"
 
     },
     "Dialog\0onPortNameChanged\0\0name\0"
@@ -56,10 +56,11 @@ QT_MOC_LITERAL(19, 269, 29) // "on_LoadFirmwareButton_clicked"
     "onDataBitsChanged\0onStopBitsChanged\0"
     "onQueryModeChanged\0onTimeoutChanged\0"
     "val\0onOpenCloseButtonClicked\0onReadyRead\0"
-    "onClockLabelUpdate\0onTextBoxLogPrint\0"
-    "str\0onPortAddedOrRemoved\0"
+    "onClockLabelUpdate\0onPortAddedOrRemoved\0"
     "on_ProgramButton_clicked\0"
-    "on_LoadFirmwareButton_clicked"
+    "on_LoadFirmwareButton_clicked\0"
+    "on_bn_ReadBoardName_clicked\0"
+    "on_bn_ReadBoardVersion_clicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -69,7 +70,7 @@ static const uint qt_meta_data_Dialog[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      14,   14, // methods
+      15,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -77,20 +78,21 @@ static const uint qt_meta_data_Dialog[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   84,    2, 0x08 /* Private */,
-       4,    1,   87,    2, 0x08 /* Private */,
-       6,    1,   90,    2, 0x08 /* Private */,
-       7,    1,   93,    2, 0x08 /* Private */,
-       8,    1,   96,    2, 0x08 /* Private */,
-       9,    1,   99,    2, 0x08 /* Private */,
-      10,    1,  102,    2, 0x08 /* Private */,
-      12,    0,  105,    2, 0x08 /* Private */,
-      13,    0,  106,    2, 0x08 /* Private */,
-      14,    0,  107,    2, 0x08 /* Private */,
-      15,    1,  108,    2, 0x08 /* Private */,
-      17,    0,  111,    2, 0x08 /* Private */,
-      18,    0,  112,    2, 0x08 /* Private */,
-      19,    0,  113,    2, 0x08 /* Private */,
+       1,    1,   89,    2, 0x08 /* Private */,
+       4,    1,   92,    2, 0x08 /* Private */,
+       6,    1,   95,    2, 0x08 /* Private */,
+       7,    1,   98,    2, 0x08 /* Private */,
+       8,    1,  101,    2, 0x08 /* Private */,
+       9,    1,  104,    2, 0x08 /* Private */,
+      10,    1,  107,    2, 0x08 /* Private */,
+      12,    0,  110,    2, 0x08 /* Private */,
+      13,    0,  111,    2, 0x08 /* Private */,
+      14,    0,  112,    2, 0x08 /* Private */,
+      15,    0,  113,    2, 0x08 /* Private */,
+      16,    0,  114,    2, 0x08 /* Private */,
+      17,    0,  115,    2, 0x08 /* Private */,
+      18,    0,  116,    2, 0x08 /* Private */,
+      19,    0,  117,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -103,7 +105,8 @@ static const uint qt_meta_data_Dialog[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,   16,
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -127,10 +130,11 @@ void Dialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         case 7: _t->onOpenCloseButtonClicked(); break;
         case 8: _t->onReadyRead(); break;
         case 9: _t->onClockLabelUpdate(); break;
-        case 10: _t->onTextBoxLogPrint((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 11: _t->onPortAddedOrRemoved(); break;
-        case 12: _t->on_ProgramButton_clicked(); break;
-        case 13: _t->on_LoadFirmwareButton_clicked(); break;
+        case 10: _t->onPortAddedOrRemoved(); break;
+        case 11: _t->on_ProgramButton_clicked(); break;
+        case 12: _t->on_LoadFirmwareButton_clicked(); break;
+        case 13: _t->on_bn_ReadBoardName_clicked(); break;
+        case 14: _t->on_bn_ReadBoardVersion_clicked(); break;
         default: ;
         }
     }
@@ -161,13 +165,13 @@ int Dialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 14)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 15;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 14)
+        if (_id < 15)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 14;
+        _id -= 15;
     }
     return _id;
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.6.1, 2016-06-18T16:50:02. -->
+<!-- Written by QtCreator 3.6.1, 2016-06-17T16:08:56. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
-  <value type="QByteArray">{989a7ffe-6513-4718-b13b-ac8e7e9e24df}</value>
+  <value type="QByteArray">{952c77cd-2a4e-4536-b1a0-1ec42a4fa0c2}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -283,8 +283,8 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">OpenCR_FW_Downloader</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:D:/git/OpenCR/OpenCR_FW_Downloader/OpenCR_FW_Downloader/OpenCR_FW_Downloader.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">OpenCR_FW_Downloader2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:Z:/git/OpenCR/OpenCR_FW_Downloader/OpenCR_FW_Downloader/OpenCR_FW_Downloader.pro</value>
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">OpenCR_FW_Downloader.pro</value>

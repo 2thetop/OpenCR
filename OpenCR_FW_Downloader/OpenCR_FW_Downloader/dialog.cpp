@@ -286,9 +286,23 @@ void Dialog::on_LoadFirmwareButton_clicked()
         //tmpstr.append( QString::number(ba.at(1), 16).rightJustified(2, '0') );
         //tmpstr.append( QString::number(ba.at(0), 16).rightJustified(2, '0') );
 
-        if(49152<index)
+        //if(49152<index)
         {
             //qDebug()<< index << tmpstr;
+            //if (port->isOpen())
+            {
+               // QString textPrint;
+               // QString strportName = textPrint.sprintf("%d : ",index) + tmpstr;
+               // QByteArray strba = strportName.toLatin1();
+                //char * p_data = ba.data();
+                //port->write(p_data,ba.length());
+               // port->write(strba);
+
+      //          port->write(tmpstr.toLatin1()+"\r\n");
+            }
+               // port->write("test");
+               //port->write(ui->textEdit_Log->toPlainText().toLatin1());
+
         }
         ui->tb_hexview->setItem((index/4)/4, (index/4)%4, new QTableWidgetItem(tmpstr.toUpper()));
 
@@ -299,8 +313,7 @@ void Dialog::on_LoadFirmwareButton_clicked()
     file.close();
 }
 
-static FILE      *opencr_fp;
-static uint32_t   opencr_fpsize;
+
 void Dialog::on_ProgramButton_clicked()
 {
     int i;
@@ -362,7 +375,7 @@ void Dialog::on_ProgramButton_clicked()
         onTextBoxLogPrint(textPrint.sprintf("file name : %s \r\n", filename));
         onTextBoxLogPrint(textPrint.sprintf("file size : %d KB\r\n", opencr_fpsize/1024));
     }
-return;
+
   fw_size = opencr_fpsize;
 
   onTextBoxLogPrint(textPrint.sprintf(">>\r\n"));
@@ -382,14 +395,20 @@ return;
   t = iclock();
   ret = opencr_ld_flash_erase(fw_size);
   dt = iclock() - t;
+   return;
   onTextBoxLogPrint(textPrint.sprintf("flash_erase : %d : %f sec\r\n", ret, GET_CALC_TIME(dt)));
   if( ret < 0 )
   {
-    port->close();
+    //port->close();
     fclose( opencr_fp );
-    exit(1);
+    onTextBoxLogPrint("erase flash failed...\r\n");
+    return;//exit(1);
   }
-
+  else
+  {
+      onTextBoxLogPrint("erase flash completed...\r\n");
+  }
+return;
   t = iclock();
   crc  = 0;
   addr = 0;
@@ -489,11 +508,12 @@ int Dialog::opencr_ld_flash_write( uint32_t addr, uint8_t *p_data, uint32_t leng
   uint32_t packet_length = 128;
   uint32_t i;
 
+   QString textPrint;
 
   err_code = cmd_flash_fw_write_begin();
   if( err_code != OK )
   {
-    printf("cmd_flash_fw_write_begin ERR : 0x%04X\r\n", err_code);
+    onTextBoxLogPrint(textPrint.sprintf("cmd_flash_fw_write_begin ERR : 0x%04X\r\n", err_code));
     return -1;
   }
 
@@ -527,27 +547,27 @@ int Dialog::opencr_ld_flash_write( uint32_t addr, uint8_t *p_data, uint32_t leng
       err_code = cmd_flash_fw_write_packet(written_packet_length, &p_data[written_total_length+written_packet_length], packet_length);
       if( err_code != OK )
       {
-    printf("cmd_flash_fw_send_block ERR : 0x%04X\r\n", err_code);
+    onTextBoxLogPrint(textPrint.sprintf("cmd_flash_fw_send_block ERR : 0x%04X\r\n", err_code));
     return -2;
       }
 
       written_packet_length += packet_length;
     }
 
-    //printf("%d : %d, %d, %d \r\n", written_packet_length, block_length, block_cnt, packet_length);
+    //onTextBoxLogPrint(textPrint.sprintf("%d : %d, %d, %d \r\n", written_packet_length, block_length, block_cnt, packet_length));
 
     if( written_packet_length == block_length )
     {
       err_code = cmd_flash_fw_write_block(addr+written_total_length, block_length);
       if( err_code != OK )
       {
-    printf("cmd_flash_fw_write_block ERR : 0x%04X\r\n", err_code);
+    onTextBoxLogPrint(textPrint.sprintf("cmd_flash_fw_write_block ERR : 0x%04X\r\n", err_code));
     return -3;
       }
     }
     else
     {
-      printf("written_packet_length : %d, %d 0x%04X\r\n", written_packet_length, block_length, err_code);
+      onTextBoxLogPrint(textPrint.sprintf("written_packet_length : %d, %d 0x%04X\r\n", written_packet_length, block_length, err_code));
       return -4;
     }
 
@@ -559,7 +579,7 @@ int Dialog::opencr_ld_flash_write( uint32_t addr, uint8_t *p_data, uint32_t leng
     }
     else if( written_total_length > length )
     {
-      printf("written_total_length over \r\n");
+      onTextBoxLogPrint(textPrint.sprintf("written_total_length over \r\n"));
       return -5;
     }
   }
@@ -584,6 +604,8 @@ int Dialog::opencr_ld_flash_read( uint32_t addr, uint8_t *p_data, uint32_t lengt
   int i;
   int err_count = 0;
 
+  QString textPrint;
+
   read_total_length = 0;
 
   while(1)
@@ -606,7 +628,7 @@ int Dialog::opencr_ld_flash_read( uint32_t addr, uint8_t *p_data, uint32_t lengt
 
     if( err_code != OK )
     {
-      printf("cmd_flash_fw_read_block : addr:%X, 0x%04X \r\n", addr+read_total_length, err_code);
+      onTextBoxLogPrint(textPrint.sprintf("cmd_flash_fw_read_block : addr:%X, 0x%04X \r\n", addr+read_total_length, err_code));
       return -1;
     }
 
@@ -618,7 +640,7 @@ int Dialog::opencr_ld_flash_read( uint32_t addr, uint8_t *p_data, uint32_t lengt
     }
     else if( read_total_length > length )
     {
-      printf("read_total_length over \r\n");
+      onTextBoxLogPrint(textPrint.sprintf("read_total_length over \r\n"));
       return -2;
     }
   }
@@ -635,11 +657,12 @@ int Dialog::opencr_ld_flash_erase( uint32_t length  )
   int ret = 0;
   err_code_t err_code = OK;
 
+  QString textPrint;
   err_code = cmd_flash_fw_erase( length );
 
   if( err_code != OK )
   {
-    printf("cmd_flash_fw_erase_block : 0x%04X %d\r\n", err_code, length );
+    onTextBoxLogPrint(textPrint.sprintf("cmd_flash_fw_erase_block : 0x%04X %d\r\n", err_code, length) );
     return -1;
   }
 
@@ -670,7 +693,7 @@ err_code_t Dialog::cmd_read_version( uint32_t *p_version, uint32_t *p_revision )
     {
       mavlink_msg_ack_decode( &rx_msg, &ack_msg);
 
-      //printf("BootVersion : 0x%08X\r\n", ack_msg.data[3]<<24|ack_msg.data[2]<<16|ack_msg.data[1]<<8|ack_msg.data[0]);
+      //onTextBoxLogPrint(textPrint.sprintf("BootVersion : 0x%08X\r\n", ack_msg.data[3]<<24|ack_msg.data[2]<<16|ack_msg.data[1]<<8|ack_msg.data[0]));
       *p_version  = ack_msg.data[3]<<24|ack_msg.data[2]<<16|ack_msg.data[1]<<8|ack_msg.data[0];
       *p_revision = ack_msg.data[7]<<24|ack_msg.data[6]<<16|ack_msg.data[5]<<8|ack_msg.data[4];
       if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
@@ -682,7 +705,7 @@ err_code_t Dialog::cmd_read_version( uint32_t *p_version, uint32_t *p_revision )
     }
   }
 
-  return OK;
+  return err_code;
 }
 
 
@@ -722,7 +745,7 @@ err_code_t Dialog::cmd_read_board_name( uint8_t *p_str, uint8_t *p_len )
     }
   }
 
-  return OK;
+  return err_code;
 }
 
 
@@ -820,8 +843,8 @@ err_code_t Dialog::cmd_flash_fw_write_end( void )
     {
       mavlink_msg_ack_decode( &rx_msg, &ack_msg);
 
-      //printf("block_count  : %d\r\n", ack_msg.data[1]<<8|ack_msg.data[0]);
-      //printf("block_length : %d\r\n", ack_msg.data[5]<<24|ack_msg.data[4]<<16|ack_msg.data[3]<<8|ack_msg.data[2]);
+      //onTextBoxLogPrint(textPrint.sprintf("block_count  : %d\r\n", ack_msg.data[1]<<8|ack_msg.data[0]));
+      //onTextBoxLogPrint(textPrint.sprintf("block_length : %d\r\n", ack_msg.data[5]<<24|ack_msg.data[4]<<16|ack_msg.data[3]<<8|ack_msg.data[2]));
 
 
       if( tx_msg.msgid == ack_msg.msg_id ) err_code = ack_msg.err_code;
@@ -973,7 +996,7 @@ err_code_t Dialog::cmd_flash_fw_read_block( uint32_t addr, uint8_t *p_data, uint
     memcpy(&p_data[received_length], resp_msg.data, resp_msg.length);
     received_length += resp_msg.length;
 
-    //printf("recv %d \r\n", received_length);
+    //onTextBoxLogPrint(textPrint.sprintf("recv %d \r\n", received_length));
 
     if( received_length == length )
     {
@@ -1129,14 +1152,14 @@ void Dialog::msg_send(uint8_t chan, mavlink_message_t *p_msg)
   uint8_t  buf[1024];
   uint16_t len;
   uint16_t write_len;
-
+QString textPrint;
   len = mavlink_msg_to_send_buffer(buf, p_msg);
 
   switch(chan)
   {
     case 0:
       write_len = write_bytes((char *)buf, (uint32_t)len);
-      if( write_len != len ) printf("wlen %d : len %d\r\n", write_len, len);
+      if( write_len != len ) onTextBoxLogPrint(textPrint.sprintf("wlen %d : len %d\r\n", write_len, len));
       break;
 
     case 1:
@@ -1168,7 +1191,7 @@ BOOL Dialog::msg_get_resp( uint8_t chan, mavlink_message_t *p_msg, uint32_t time
   uint32_t retry = timeout;
 
 
-  ser_set_timeout_ms( 1 );
+  ser_set_timeout_ms( 1000 );
 
   while(1)
   {
@@ -1262,3 +1285,48 @@ long Dialog::iclock()
 
 }
 
+
+void Dialog::on_bn_ReadBoardName_clicked()
+{
+    err_code_t err_code = OK;
+    QString textPrint;
+    uint8_t  board_str[16];
+    uint8_t  board_str_len;
+
+    if(port->isOpen())
+    {
+        err_code = cmd_read_board_name( board_str, &board_str_len );
+        if( err_code == OK )
+        {
+            onTextBoxLogPrint(textPrint.sprintf("Board Name : %s\r\n", board_str));
+        }
+    }
+    else
+    {
+        onTextBoxLogPrint("port is not opened...\r\n");
+    }
+}
+
+void Dialog::on_bn_ReadBoardVersion_clicked()
+{
+    err_code_t err_code = OK;
+    QString textPrint;
+    uint32_t board_version;
+    uint32_t board_revision;
+
+    if(port->isOpen())
+    {
+        err_code = cmd_read_version( &board_version, &board_revision );
+        if( err_code == OK )
+        {
+          onTextBoxLogPrint(textPrint.sprintf("Board Ver  : 0x%08X\r\n", board_version));
+          onTextBoxLogPrint(textPrint.sprintf("Board Rev  : 0x%08X\r\n", board_revision));
+        }
+
+
+    }
+    else
+    {
+        onTextBoxLogPrint("port is not opened...\r\n");
+    }
+}

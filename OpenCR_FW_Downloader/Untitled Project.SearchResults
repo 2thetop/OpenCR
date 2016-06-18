@@ -1,9 +1,0 @@
----- opencr_ld_file_read_data Matches (8 in 3 files) ----
-Dialog.cpp (opencr_fw_downloader):    len = opencr_ld_file_read_data( block_buf, FLASH_TX_BLOCK_LENGTH);
-Dialog.cpp (opencr_fw_downloader):    len = opencr_ld_file_read_data( block_buf, FLASH_TX_BLOCK_LENGTH);
-Dialog.cpp (opencr_fw_downloader):     TITLE   : opencr_ld_file_read_data
-Dialog.cpp (opencr_fw_downloader):uint32_t Dialog::opencr_ld_file_read_data( uint8_t *dst, uint32_t len )
-Opencr_ld.c (opencr_fw_downloader):    len = opencr_ld_file_read_data( block_buf, FLASH_TX_BLOCK_LENGTH);
-Opencr_ld.c (opencr_fw_downloader):     TITLE   : opencr_ld_file_read_data
-Opencr_ld.c (opencr_fw_downloader):uint32_t opencr_ld_file_read_data( uint8_t *dst, uint32_t len )
-Opencr_ld.h (opencr_fw_downloader):uint32_t opencr_ld_file_read_data( uint8_t *dst, uint32_t len );

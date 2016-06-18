@@ -36,6 +36,16 @@ class Ui_Dialog
 public:
     QTableWidget *tb_hexview;
     QWidget *layoutWidget;
+    QVBoxLayout *verticalLayout_4;
+    QTextEdit *textEdit_Log;
+    QProgressBar *progressBar_Status;
+    QWidget *layoutWidget1;
+    QHBoxLayout *horizontalLayout_5;
+    QLabel *label_12;
+    QSpacerItem *horizontalSpacer;
+    QLabel *label_13;
+    QWidget *layoutWidget2;
+    QHBoxLayout *horizontalLayout_6;
     QVBoxLayout *verticalLayout_2;
     QFormLayout *formLayout;
     QLabel *label;
@@ -53,13 +63,9 @@ public:
     QLabel *label_6;
     QComboBox *queryModeBox;
     QSpacerItem *verticalSpacer;
+    QPushButton *bn_ReadBoardVersion;
+    QPushButton *bn_ReadBoardName;
     QPushButton *openCloseButton;
-    QLabel *label_12;
-    QWidget *layoutWidget1;
-    QVBoxLayout *verticalLayout_4;
-    QTextEdit *textEdit_Log;
-    QProgressBar *progressBar_Status;
-    QWidget *layoutWidget2;
     QVBoxLayout *verticalLayout_5;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout;
@@ -79,7 +85,6 @@ public:
     QPushButton *sendButton_3;
     QPushButton *sendButton_2;
     QPushButton *ProgramButton;
-    QLabel *label_13;
 
     void setupUi(QDialog *Dialog)
     {
@@ -91,71 +96,115 @@ public:
         tb_hexview->setGeometry(QRect(380, 10, 451, 431));
         layoutWidget = new QWidget(Dialog);
         layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 10, 161, 411));
-        verticalLayout_2 = new QVBoxLayout(layoutWidget);
+        layoutWidget->setGeometry(QRect(10, 450, 821, 220));
+        verticalLayout_4 = new QVBoxLayout(layoutWidget);
+        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        verticalLayout_4->setContentsMargins(0, 0, 0, 0);
+        textEdit_Log = new QTextEdit(layoutWidget);
+        textEdit_Log->setObjectName(QStringLiteral("textEdit_Log"));
+
+        verticalLayout_4->addWidget(textEdit_Log);
+
+        progressBar_Status = new QProgressBar(layoutWidget);
+        progressBar_Status->setObjectName(QStringLiteral("progressBar_Status"));
+        progressBar_Status->setValue(24);
+
+        verticalLayout_4->addWidget(progressBar_Status);
+
+        layoutWidget1 = new QWidget(Dialog);
+        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
+        layoutWidget1->setGeometry(QRect(10, 420, 361, 31));
+        horizontalLayout_5 = new QHBoxLayout(layoutWidget1);
+        horizontalLayout_5->setSpacing(6);
+        horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
+        horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
+        label_12 = new QLabel(layoutWidget1);
+        label_12->setObjectName(QStringLiteral("label_12"));
+
+        horizontalLayout_5->addWidget(label_12);
+
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_5->addItem(horizontalSpacer);
+
+        label_13 = new QLabel(layoutWidget1);
+        label_13->setObjectName(QStringLiteral("label_13"));
+
+        horizontalLayout_5->addWidget(label_13);
+
+        layoutWidget2 = new QWidget(Dialog);
+        layoutWidget2->setObjectName(QStringLiteral("layoutWidget2"));
+        layoutWidget2->setGeometry(QRect(10, 10, 361, 411));
+        horizontalLayout_6 = new QHBoxLayout(layoutWidget2);
+        horizontalLayout_6->setSpacing(6);
+        horizontalLayout_6->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        horizontalLayout_6->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setSpacing(6);
-        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         formLayout = new QFormLayout();
         formLayout->setSpacing(6);
         formLayout->setObjectName(QStringLiteral("formLayout"));
-        label = new QLabel(layoutWidget);
+        label = new QLabel(layoutWidget2);
         label->setObjectName(QStringLiteral("label"));
 
         formLayout->setWidget(0, QFormLayout::LabelRole, label);
 
-        portBox = new QComboBox(layoutWidget);
+        portBox = new QComboBox(layoutWidget2);
         portBox->setObjectName(QStringLiteral("portBox"));
 
         formLayout->setWidget(0, QFormLayout::FieldRole, portBox);
 
-        label_2 = new QLabel(layoutWidget);
+        label_2 = new QLabel(layoutWidget2);
         label_2->setObjectName(QStringLiteral("label_2"));
 
         formLayout->setWidget(1, QFormLayout::LabelRole, label_2);
 
-        baudRateBox = new QComboBox(layoutWidget);
+        baudRateBox = new QComboBox(layoutWidget2);
         baudRateBox->setObjectName(QStringLiteral("baudRateBox"));
 
         formLayout->setWidget(1, QFormLayout::FieldRole, baudRateBox);
 
-        label_3 = new QLabel(layoutWidget);
+        label_3 = new QLabel(layoutWidget2);
         label_3->setObjectName(QStringLiteral("label_3"));
 
         formLayout->setWidget(2, QFormLayout::LabelRole, label_3);
 
-        dataBitsBox = new QComboBox(layoutWidget);
+        dataBitsBox = new QComboBox(layoutWidget2);
         dataBitsBox->setObjectName(QStringLiteral("dataBitsBox"));
 
         formLayout->setWidget(2, QFormLayout::FieldRole, dataBitsBox);
 
-        label_4 = new QLabel(layoutWidget);
+        label_4 = new QLabel(layoutWidget2);
         label_4->setObjectName(QStringLiteral("label_4"));
 
         formLayout->setWidget(3, QFormLayout::LabelRole, label_4);
 
-        parityBox = new QComboBox(layoutWidget);
+        parityBox = new QComboBox(layoutWidget2);
         parityBox->setObjectName(QStringLiteral("parityBox"));
 
         formLayout->setWidget(3, QFormLayout::FieldRole, parityBox);
 
-        label_5 = new QLabel(layoutWidget);
+        label_5 = new QLabel(layoutWidget2);
         label_5->setObjectName(QStringLiteral("label_5"));
 
         formLayout->setWidget(4, QFormLayout::LabelRole, label_5);
 
-        stopBitsBox = new QComboBox(layoutWidget);
+        stopBitsBox = new QComboBox(layoutWidget2);
         stopBitsBox->setObjectName(QStringLiteral("stopBitsBox"));
 
         formLayout->setWidget(4, QFormLayout::FieldRole, stopBitsBox);
 
-        label_7 = new QLabel(layoutWidget);
+        label_7 = new QLabel(layoutWidget2);
         label_7->setObjectName(QStringLiteral("label_7"));
 
         formLayout->setWidget(5, QFormLayout::LabelRole, label_7);
 
-        timeoutBox = new QSpinBox(layoutWidget);
+        timeoutBox = new QSpinBox(layoutWidget2);
         timeoutBox->setObjectName(QStringLiteral("timeoutBox"));
         timeoutBox->setMinimum(-1);
         timeoutBox->setMaximum(10000);
@@ -164,12 +213,12 @@ public:
 
         formLayout->setWidget(5, QFormLayout::FieldRole, timeoutBox);
 
-        label_6 = new QLabel(layoutWidget);
+        label_6 = new QLabel(layoutWidget2);
         label_6->setObjectName(QStringLiteral("label_6"));
 
         formLayout->setWidget(6, QFormLayout::LabelRole, label_6);
 
-        queryModeBox = new QComboBox(layoutWidget);
+        queryModeBox = new QComboBox(layoutWidget2);
         queryModeBox->setObjectName(QStringLiteral("queryModeBox"));
 
         formLayout->setWidget(6, QFormLayout::FieldRole, queryModeBox);
@@ -181,41 +230,27 @@ public:
 
         verticalLayout_2->addItem(verticalSpacer);
 
-        openCloseButton = new QPushButton(layoutWidget);
+        bn_ReadBoardVersion = new QPushButton(layoutWidget2);
+        bn_ReadBoardVersion->setObjectName(QStringLiteral("bn_ReadBoardVersion"));
+
+        verticalLayout_2->addWidget(bn_ReadBoardVersion);
+
+        bn_ReadBoardName = new QPushButton(layoutWidget2);
+        bn_ReadBoardName->setObjectName(QStringLiteral("bn_ReadBoardName"));
+
+        verticalLayout_2->addWidget(bn_ReadBoardName);
+
+        openCloseButton = new QPushButton(layoutWidget2);
         openCloseButton->setObjectName(QStringLiteral("openCloseButton"));
 
         verticalLayout_2->addWidget(openCloseButton);
 
-        label_12 = new QLabel(Dialog);
-        label_12->setObjectName(QStringLiteral("label_12"));
-        label_12->setGeometry(QRect(20, 430, 70, 20));
-        layoutWidget1 = new QWidget(Dialog);
-        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
-        layoutWidget1->setGeometry(QRect(10, 450, 821, 220));
-        verticalLayout_4 = new QVBoxLayout(layoutWidget1);
-        verticalLayout_4->setSpacing(6);
-        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
-        verticalLayout_4->setContentsMargins(0, 0, 0, 0);
-        textEdit_Log = new QTextEdit(layoutWidget1);
-        textEdit_Log->setObjectName(QStringLiteral("textEdit_Log"));
 
-        verticalLayout_4->addWidget(textEdit_Log);
+        horizontalLayout_6->addLayout(verticalLayout_2);
 
-        progressBar_Status = new QProgressBar(layoutWidget1);
-        progressBar_Status->setObjectName(QStringLiteral("progressBar_Status"));
-        progressBar_Status->setValue(24);
-
-        verticalLayout_4->addWidget(progressBar_Status);
-
-        layoutWidget2 = new QWidget(Dialog);
-        layoutWidget2->setObjectName(QStringLiteral("layoutWidget2"));
-        layoutWidget2->setGeometry(QRect(180, 12, 191, 411));
-        verticalLayout_5 = new QVBoxLayout(layoutWidget2);
+        verticalLayout_5 = new QVBoxLayout();
         verticalLayout_5->setSpacing(6);
-        verticalLayout_5->setContentsMargins(11, 11, 11, 11);
         verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
-        verticalLayout_5->setContentsMargins(0, 0, 0, 0);
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(6);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
@@ -329,9 +364,9 @@ public:
 
         verticalLayout_5->addLayout(verticalLayout_3);
 
-        label_13 = new QLabel(Dialog);
-        label_13->setObjectName(QStringLiteral("label_13"));
-        label_13->setGeometry(QRect(258, 427, 111, 20));
+
+        horizontalLayout_6->addLayout(verticalLayout_5);
+
 
         retranslateUi(Dialog);
 
@@ -341,6 +376,8 @@ public:
     void retranslateUi(QDialog *Dialog)
     {
         Dialog->setWindowTitle(QApplication::translate("Dialog", "Dialog", 0));
+        label_12->setText(QApplication::translate("Dialog", "Status Log :", 0));
+        label_13->setText(QApplication::translate("Dialog", "localTime", 0));
         label->setText(QApplication::translate("Dialog", "Port:", 0));
         label_2->setText(QApplication::translate("Dialog", "BaudRate:", 0));
         label_3->setText(QApplication::translate("Dialog", "DataBits:", 0));
@@ -349,8 +386,9 @@ public:
         label_7->setText(QApplication::translate("Dialog", "Timeout:", 0));
         timeoutBox->setSuffix(QApplication::translate("Dialog", " ms", 0));
         label_6->setText(QApplication::translate("Dialog", "QueryMode:", 0));
+        bn_ReadBoardVersion->setText(QApplication::translate("Dialog", "Get Board Version", 0));
+        bn_ReadBoardName->setText(QApplication::translate("Dialog", "Get Board Name", 0));
         openCloseButton->setText(QApplication::translate("Dialog", "Open/Close", 0));
-        label_12->setText(QApplication::translate("Dialog", "Status Log :", 0));
         label_8->setText(QApplication::translate("Dialog", "Port On/Off Status", 0));
         label_9->setText(QApplication::translate("Dialog", "Mavlink connection Status", 0));
         label_11->setText(QApplication::translate("Dialog", "TX", 0));
@@ -359,7 +397,6 @@ public:
         sendButton_3->setText(QApplication::translate("Dialog", "Erase", 0));
         sendButton_2->setText(QApplication::translate("Dialog", "Verify", 0));
         ProgramButton->setText(QApplication::translate("Dialog", "Program", 0));
-        label_13->setText(QApplication::translate("Dialog", "localTime", 0));
     } // retranslateUi
 
 };

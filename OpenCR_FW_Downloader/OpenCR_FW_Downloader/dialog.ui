@@ -45,7 +45,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -84,7 +84,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -198,6 +198,20 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="bn_ReadBoardVersion">
+        <property name="text">
+         <string>Get Board Version</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="bn_ReadBoardName">
+        <property name="text">
+         <string>Get Board Name</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="openCloseButton">
