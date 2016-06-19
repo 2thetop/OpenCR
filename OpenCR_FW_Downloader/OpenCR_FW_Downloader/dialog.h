@@ -63,6 +63,7 @@ private:
     QTimer *timer_colck;
     QextSerialPort *port;
     QextSerialEnumerator *enumerator;
+    QQueue<QByteArray> read_Data;
 
 public:
     QStringList fileNames;

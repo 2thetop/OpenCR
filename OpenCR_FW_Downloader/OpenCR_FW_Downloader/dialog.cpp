@@ -8,6 +8,7 @@
 #include <QCoreApplication>
 #include <QMessageBox>
 #include <QDebug>
+#include <QQueue>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -192,8 +193,10 @@ void Dialog::onOpenCloseButtonClicked()
 void Dialog::onReadyRead()
 {
     if (port->bytesAvailable()) {
-        ui->textEdit_Log->moveCursor(QTextCursor::End);
-        ui->textEdit_Log->insertPlainText(QString::fromLatin1(port->readAll()));
+       // ui->textEdit_Log->moveCursor(QTextCursor::End);
+       // ui->textEdit_Log->insertPlainText(QString::fromLatin1(port->readAll()));
+        read_Data = port->readAll();
+        onTextBoxLogPrint(QString::fromLatin1(read_Data));
     }
 }
 
@@ -1159,7 +1162,7 @@ QString textPrint;
   {
     case 0:
       write_len = write_bytes((char *)buf, (uint32_t)len);
-      if( write_len != len ) onTextBoxLogPrint(textPrint.sprintf("wlen %d : len %d\r\n", write_len, len));
+       onTextBoxLogPrint(textPrint.sprintf("wlen %d : len %d\r\n", write_len, len));
       break;
 
     case 1:
@@ -1254,7 +1257,11 @@ int Dialog::read_byte( void )
     //return ser_read_byte( stm32_ser_id );
     char byte;
     ui->led_Rx->turnOn();
-    port->read(&byte,1);
+    //port->read(&byte,1);
+    if(!read_Data.isEmpty())
+    {
+        byte = read_Data.data()
+    }
     ui->led_Rx->turnOff();
     return (int)byte;
 }
@@ -1267,10 +1274,11 @@ int Dialog::read_byte( void )
 int Dialog::write_bytes( char *p_data, int len )
 {
     int written_len;
-    ui->led_Tx->turnOn();
-    //written_len = ser_write( stm32_ser_id, (const u8 *)p_data, len );
-    written_len = port->write(p_data,len);
-    ui->led_Tx->turnOff();
+    QByteArray databuf;
+    databuf = QByteArray(p_data, len);
+    written_len = port->write(databuf);
+    //port->write("tesysdfgsdfgasdf");
+    //ui->led_Tx->turnOff();
     return written_len;
 }
 
@@ -1292,6 +1300,11 @@ void Dialog::on_bn_ReadBoardName_clicked()
     QString textPrint;
     uint8_t  board_str[16];
     uint8_t  board_str_len;
+
+    //textPrint = "test";
+    //QByteArray databuf = textPrint.toLatin1();
+   // databuf = QByteArray(p_data, len);
+    //port->write(databuf);
 
     if(port->isOpen())
     {
