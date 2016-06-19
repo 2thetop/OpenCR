@@ -1,27 +1,15 @@
----- msg_send Matches (26 in 5 files) ----
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):void Dialog::msg_send(uint8_t chan, mavlink_message_t *p_msg)
-Dialog.h (opencr_fw_downloader\opencr_fw_downloader):    void msg_send(uint8_t chan, mavlink_message_t *p_msg);
-Msg.c (opencr_fw_downloader\opencr_fw_downloader\msg):void msg_send(uint8_t chan, mavlink_message_t *p_msg)
-Msg.h (opencr_fw_downloader\opencr_fw_downloader\msg):void msg_send(uint8_t chan, mavlink_message_t *p_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
-Opencr_ld.c (opencr_fw_downloader\opencr_fw_downloader):  msg_send(0, &tx_msg);
+---- deviceDiscovered Matches (14 in 7 files) ----
+Dialog.cpp (opencr_fw_downloader\opencr_fw_downloader):    connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
+Moc_qextserialenumerator.cpp (opencr_fw_downloader\build-opencr_fw_downloader-desktop_qt_5_6_0_mingw_32bit-debug\debug):QT_MOC_LITERAL(1, 21, 16), // "deviceDiscovered"
+Moc_qextserialenumerator.cpp (opencr_fw_downloader\build-opencr_fw_downloader-desktop_qt_5_6_0_mingw_32bit-debug\debug):        case 0: _t->deviceDiscovered((*reinterpret_cast< const QextPortInfo(*)>(_a[1]))); break;
+Moc_qextserialenumerator.cpp (opencr_fw_downloader\build-opencr_fw_downloader-desktop_qt_5_6_0_mingw_32bit-debug\debug):            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&QextSerialEnumerator::deviceDiscovered)) {
+Moc_qextserialenumerator.cpp (opencr_fw_downloader\build-opencr_fw_downloader-desktop_qt_5_6_0_mingw_32bit-debug\debug):void QextSerialEnumerator::deviceDiscovered(const QextPortInfo & _t1)
+Qextserialenumerator.cpp (opencr_fw_downloader\opencr_fw_downloader\qextserialport):    setUpNotifications() and then connect to the deviceDiscovered() and deviceRemoved()
+Qextserialenumerator.cpp (opencr_fw_downloader\opencr_fw_downloader\qextserialport):    connect(enumerator, SIGNAL(deviceDiscovered(const QextPortInfo &)),
+Qextserialenumerator.cpp (opencr_fw_downloader\opencr_fw_downloader\qextserialport):    \fn void QextSerialEnumerator::deviceDiscovered(const QextPortInfo &info)
+Qextserialenumerator.h (opencr_fw_downloader\opencr_fw_downloader\qextserialport):    void deviceDiscovered(const QextPortInfo &info);
+Qextserialenumerator_linux.cpp (opencr_fw_downloader\opencr_fw_downloader\qextserialport):        Q_EMIT q->deviceDiscovered(i);
+Qextserialenumerator_linux.cpp (opencr_fw_downloader\opencr_fw_downloader\qextserialport):            Q_EMIT q->deviceDiscovered(pi);
+Qextserialenumerator_osx.cpp (opencr_fw_downloader\opencr_fw_downloader\qextserialport):        Q_EMIT q->deviceDiscovered(info);
+Qextserialenumerator_win.cpp (opencr_fw_downloader\opencr_fw_downloader\qextserialport):        Q_EMIT q->deviceDiscovered(port);
+Qextserialenumerator_win.cpp (opencr_fw_downloader\opencr_fw_downloader\qextserialport):                    Q_EMIT q->deviceDiscovered(info);

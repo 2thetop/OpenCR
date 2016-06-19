@@ -2,6 +2,8 @@
 #define DIALOG_H
 
 #include <QDialog>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include "./msg/def.h"
 
 #define GET_CALC_TIME(x)	( (int)(x / 1000) + ((float)(x % 1000))/1000 )
@@ -22,8 +24,8 @@ namespace Ui {
 class Dialog;
 }
 class QTimer;
-class QextSerialPort;
-class QextSerialEnumerator;
+//class QextSerialPort;
+//class QextSerialEnumerator;
 
 class Dialog : public QDialog
 {
@@ -61,11 +63,12 @@ private:
     Ui::Dialog *ui;
     QTimer *timer;
     QTimer *timer_colck;
-    QextSerialPort *port;
-    QextSerialEnumerator *enumerator;
-    QQueue<QByteArray> read_Data;
+    //QextSerialPort *port;
+   // QextSerialEnumerator *enumerator;
+    QByteArray read_Data;
 
 public:
+    QSerialPort* port = new QSerialPort();
     QStringList fileNames;
      FILE      *opencr_fp;
      uint32_t   opencr_fpsize;
@@ -93,7 +96,6 @@ public:
     BOOL msg_recv( uint8_t chan, uint8_t data , mavlink_message_t *p_msg, mavlink_status_t *p_status );
     BOOL msg_get_resp( uint8_t chan, mavlink_message_t *p_msg, uint32_t timeout);
 
-    void ser_set_timeout_ms(long val );
     int read_byte( void );
     int write_bytes( char *p_data, int len );
 

@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = OpenCR_FW_Downloader
 TEMPLATE = app
 
-include(./qextserialport/qextserialport.pri)
+#include(./qextserialport/qextserialport.pri)
 
 SOURCES += main.cpp\
         dialog.cpp \

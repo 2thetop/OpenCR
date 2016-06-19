@@ -1,7 +1,7 @@
 #include "dialog.h"
 #include "ui_dialog.h"
-#include "qextserialport.h"
-#include "qextserialenumerator.h"
+//#include "qextserialport.h"
+//#include "qextserialenumerator.h"
 #include <QtCore>
 #include <QFileDialog>
 #include <QTextCodec>
@@ -24,34 +24,38 @@ Dialog::Dialog(QWidget *parent) :
     ui->setupUi(this);
 
     //! [0]
-    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
-        ui->portBox->addItem(info.portName);
+   // foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
+    foreach( QSerialPortInfo port, QSerialPortInfo::availablePorts())
+    {
+        ui->portBox->addItem(port.portName());
+    }
+
     //make sure user can input their own port name!
     ui->portBox->setEditable(true);
 
-    ui->baudRateBox->addItem("1200", BAUD1200);
-    ui->baudRateBox->addItem("2400", BAUD2400);
-    ui->baudRateBox->addItem("4800", BAUD4800);
-    ui->baudRateBox->addItem("9600", BAUD9600);
-    ui->baudRateBox->addItem("19200", BAUD19200);
-    ui->baudRateBox->addItem("115200", BAUD115200);
+    ui->baudRateBox->addItem("9600", QSerialPort::Baud9600);
+    ui->baudRateBox->addItem("19200", QSerialPort::Baud19200);
+    ui->baudRateBox->addItem("38400", QSerialPort::Baud38400);
+    ui->baudRateBox->addItem("57600", QSerialPort::Baud57600);
+    ui->baudRateBox->addItem("115200", QSerialPort::Baud115200);
     ui->baudRateBox->setCurrentIndex(5);
 
-    ui->parityBox->addItem("NONE", PAR_NONE);
-    ui->parityBox->addItem("ODD", PAR_ODD);
-    ui->parityBox->addItem("EVEN", PAR_EVEN);
+    ui->parityBox->addItem("NONE", QSerialPort::NoParity);
+    ui->parityBox->addItem("ODD", QSerialPort::OddParity);
+    ui->parityBox->addItem("EVEN", QSerialPort::EvenParity);
 
-    ui->dataBitsBox->addItem("5", DATA_5);
-    ui->dataBitsBox->addItem("6", DATA_6);
-    ui->dataBitsBox->addItem("7", DATA_7);
-    ui->dataBitsBox->addItem("8", DATA_8);
+    ui->dataBitsBox->addItem("5",QSerialPort::Data5);
+    ui->dataBitsBox->addItem("6", QSerialPort::Data6);
+    ui->dataBitsBox->addItem("7", QSerialPort::Data7);
+    ui->dataBitsBox->addItem("8", QSerialPort::Data8);
     ui->dataBitsBox->setCurrentIndex(3);
 
-    ui->stopBitsBox->addItem("1", STOP_1);
-    ui->stopBitsBox->addItem("2", STOP_2);
+    ui->stopBitsBox->addItem("1", QSerialPort::OneStop);
+    ui->stopBitsBox->addItem("2", QSerialPort::TwoStop);
 
-    ui->queryModeBox->addItem("Polling", QextSerialPort::Polling);
-    ui->queryModeBox->addItem("EventDriven", QextSerialPort::EventDriven);
+    ui->queryModeBox->addItem("NoFlowControl", QSerialPort::NoFlowControl);
+    ui->queryModeBox->addItem("HardwareControl", QSerialPort::HardwareControl);
+    ui->queryModeBox->addItem("SoftwareControl", QSerialPort::SoftwareControl);
     //! [0]
 
     ui->led_SerialOnOff->turnOff();
@@ -63,16 +67,15 @@ Dialog::Dialog(QWidget *parent) :
     timer->setInterval(40);
 
     timer_colck = new QTimer(this);
-    connect(timer_colck, SIGNAL(timeout()), this, SLOT(onClockLabelUpdate()));
     timer_colck->start(1000);
 
     //! [1]
-    PortSettings settings = {BAUD9600, DATA_8, PAR_NONE, STOP_1, FLOW_OFF, 10};
-    port = new QextSerialPort(ui->portBox->currentText(), settings, QextSerialPort::Polling);
+   // PortSettings settings = {BAUD9600, DATA_8, PAR_NONE, STOP_1, FLOW_OFF, 10};
+   // port = new QextSerialPort(ui->portBox->currentText(), settings, QextSerialPort::Polling);
     //! [1]
 
-    enumerator = new QextSerialEnumerator(this);
-    enumerator->setUpNotifications();
+    //enumerator = new QextSerialEnumerator(this);
+    //enumerator->setUpNotifications();
 
     connect(ui->baudRateBox, SIGNAL(currentIndexChanged(int)), SLOT(onBaudRateChanged(int)));
     connect(ui->parityBox, SIGNAL(currentIndexChanged(int)), SLOT(onParityChanged(int)));
@@ -83,11 +86,12 @@ Dialog::Dialog(QWidget *parent) :
     connect(ui->portBox, SIGNAL(editTextChanged(QString)), SLOT(onPortNameChanged(QString)));
     connect(ui->openCloseButton, SIGNAL(clicked()), SLOT(onOpenCloseButtonClicked()));
 
+    connect(timer_colck, SIGNAL(timeout()), this, SLOT(onClockLabelUpdate()));
     connect(timer, SIGNAL(timeout()), SLOT(onReadyRead()));
     connect(port, SIGNAL(readyRead()), SLOT(onReadyRead()));
 
-    connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
-    connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
+    //connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
+    //connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
 
     ui->tb_hexview->setRowCount(1);
     ui->tb_hexview->setColumnCount(1);
@@ -127,32 +131,32 @@ void Dialog::onPortNameChanged(const QString & /*name*/)
 //! [2]
 void Dialog::onBaudRateChanged(int idx)
 {
-    port->setBaudRate((BaudRateType)ui->baudRateBox->itemData(idx).toInt());
+    port->setBaudRate((QSerialPort::BaudRate)ui->baudRateBox->itemData(idx).toInt());
 }
 
 void Dialog::onParityChanged(int idx)
 {
-    port->setParity((ParityType)ui->parityBox->itemData(idx).toInt());
+    port->setParity((QSerialPort::Parity)ui->parityBox->itemData(idx).toInt());
 }
 
 void Dialog::onDataBitsChanged(int idx)
 {
-    port->setDataBits((DataBitsType)ui->dataBitsBox->itemData(idx).toInt());
+    port->setDataBits((QSerialPort::DataBits)ui->dataBitsBox->itemData(idx).toInt());
 }
 
 void Dialog::onStopBitsChanged(int idx)
 {
-    port->setStopBits((StopBitsType)ui->stopBitsBox->itemData(idx).toInt());
+    port->setStopBits((QSerialPort::StopBits)ui->stopBitsBox->itemData(idx).toInt());
 }
 
 void Dialog::onQueryModeChanged(int idx)
 {
-    port->setQueryMode((QextSerialPort::QueryMode)ui->queryModeBox->itemData(idx).toInt());
+    port->setFlowControl((QSerialPort::FlowControl)ui->queryModeBox->itemData(idx).toInt());
 }
 
 void Dialog::onTimeoutChanged(int val)
 {
-    port->setTimeout(val);
+  //  port->->set->setTimeout(val);
 }
 //! [2]
 //! [3]
@@ -179,7 +183,7 @@ void Dialog::onOpenCloseButtonClicked()
     }
 
     //If using polling mode, we need a QTimer
-    if (port->isOpen() && port->queryMode() == QextSerialPort::Polling)
+    if (port->isOpen() && port->flowControl() == QSerialPort::NoFlowControl)
         timer->start();
     else
         timer->stop();
@@ -214,8 +218,10 @@ void Dialog::onPortAddedOrRemoved()
 
     ui->portBox->blockSignals(true);
     ui->portBox->clear();
-    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
-        ui->portBox->addItem(info.portName);
+    foreach( QSerialPortInfo port, QSerialPortInfo::availablePorts())
+    {
+        ui->portBox->addItem(port.portName());
+    }
 
     ui->portBox->setCurrentIndex(ui->portBox->findText(current));
 
@@ -1194,7 +1200,7 @@ BOOL Dialog::msg_get_resp( uint8_t chan, mavlink_message_t *p_msg, uint32_t time
   uint32_t retry = timeout;
 
 
-  ser_set_timeout_ms( 1000 );
+  port->waitForReadyRead(1000);
 
   while(1)
   {
@@ -1236,18 +1242,6 @@ BOOL Dialog::msg_get_resp( uint8_t chan, mavlink_message_t *p_msg, uint32_t time
   return ret;
 }
 
-
-/*---------------------------------------------------------------------------
-     TITLE   : read_byte
-     WORK    :
----------------------------------------------------------------------------*/
-void Dialog::ser_set_timeout_ms(long val )
-{
-    port->setTimeout(val);
-
-    return;
-}
-
 /*---------------------------------------------------------------------------
      TITLE   : read_byte
      WORK    :
@@ -1258,10 +1252,10 @@ int Dialog::read_byte( void )
     char byte;
     ui->led_Rx->turnOn();
     //port->read(&byte,1);
-    if(!read_Data.isEmpty())
-    {
-        byte = read_Data.data()
-    }
+ //   if(!read_Data.isEmpty())
+ //   {
+ //       byte = read_Data.data()
+  //  }
     ui->led_Rx->turnOff();
     return (int)byte;
 }

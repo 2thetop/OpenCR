@@ -172,7 +172,6 @@ Makefile: ../OpenCR_FW_Downloader/OpenCR_FW_Downloader.pro C:/Qt/Qt5.6.0/5.6/min
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/exclusive_builds.prf \
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/default_pre.prf \
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/win32/default_pre.prf \
-		../OpenCR_FW_Downloader/qextserialport/qextserialport.pri \
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/resolve_config.prf \
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/exclusive_builds_post.prf \
 		C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/default_post.prf \
@@ -310,7 +309,6 @@ C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/spec_post.prf:
 C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/exclusive_builds.prf:
 C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/default_pre.prf:
 C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/win32/default_pre.prf:
-../OpenCR_FW_Downloader/qextserialport/qextserialport.pri:
 C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/resolve_config.prf:
 C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/exclusive_builds_post.prf:
 C:/Qt/Qt5.6.0/5.6/mingw49_32/mkspecs/features/default_post.prf:
