@@ -191,11 +191,11 @@ void Dialog::onOpenCloseButtonClicked()
 
 void Dialog::onReadyRead()
 {
-    if (port->bytesAvailable()) {
+    /*if (port->bytesAvailable()) {
         QByteArray ba = port->readAll();
         ui->textEdit_Log->moveCursor(QTextCursor::End);
         ui->textEdit_Log->insertPlainText(QString::fromLatin1(ba));
-    }
+    }*/
 }
 
 void Dialog::onClockLabelUpdate()
@@ -726,7 +726,7 @@ err_code_t Dialog::cmd_read_board_name( uint8_t *p_str, uint8_t *p_len )
 
   mavlink_msg_read_board_name_pack(0, 0, &tx_msg, resp, param);
   msg_send(0, &tx_msg);
-return err_code;
+
   if( resp == 1 )
   {
     if( msg_get_resp(0, &rx_msg, 500) == TRUE )
@@ -1192,43 +1192,25 @@ BOOL Dialog::msg_get_resp( uint8_t chan, mavlink_message_t *p_msg, uint32_t time
   uint32_t retry = timeout;
 
 
-  ser_set_timeout_ms( 1000 );
-
   while(1)
   {
-    ch_ret = read_byte();
-
-    if( ch_ret < 0 )
-    {
-        if( retry-- <= 0 )
+      if(port->bytesAvailable())
+      {
+        QByteArray ch_ret = port->readAll();
+    
+        ret = msg_recv( chan, ch, &msg[chan], &status[chan] );
+    
+        if( ret == TRUE )
         {
-            ret = FALSE;
-
+            ui->led_MavlinkStatus->turnOn();
+            *p_msg = msg[chan];
             break;
         }
         else
         {
-            continue;
+            ui->led_MavlinkStatus->turnOff();
         }
-    }
-    else
-    {
-      ch = (uint8_t)(ch_ret);
-      retry = timeout;
-    }
-
-    ret = msg_recv( chan, ch, &msg[chan], &status[chan] );
-
-    if( ret == TRUE )
-    {
-        ui->led_MavlinkStatus->turnOn();
-        *p_msg = msg[chan];
-        break;
-    }
-    else
-    {
-        ui->led_MavlinkStatus->turnOff();
-    }
+      }
   }
 
   return ret;
