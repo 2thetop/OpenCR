@@ -38,7 +38,7 @@ Dialog::Dialog(QWidget *parent) :
     ui->baudRateBox->addItem("38400", QSerialPort::Baud38400);
     ui->baudRateBox->addItem("57600", QSerialPort::Baud57600);
     ui->baudRateBox->addItem("115200", QSerialPort::Baud115200);
-    ui->baudRateBox->setCurrentIndex(5);
+    ui->baudRateBox->setCurrentIndex(4);
 
     ui->parityBox->addItem("NONE", QSerialPort::NoParity);
     ui->parityBox->addItem("ODD", QSerialPort::OddParity);
@@ -209,6 +209,11 @@ void Dialog::onClockLabelUpdate()
     QDateTime local(QDateTime::currentDateTime());
     ui->label_13->setText(local.toString("hh:mm:ss A"));
 
+    //ui->portBox->clear();
+    //foreach( QSerialPortInfo port, QSerialPortInfo::availablePorts())
+    //{
+    //    ui->portBox->addItem(port.portName());
+    //}
     //onTextBoxLogPrint("test\r\n");
 }
 
@@ -307,7 +312,7 @@ void Dialog::on_LoadFirmwareButton_clicked()
                 //port->write(p_data,ba.length());
                // port->write(strba);
 
-      //          port->write(tmpstr.toLatin1()+"\r\n");
+                port->write(tmpstr.toLatin1()+"\r\n");
             }
                // port->write("test");
                //port->write(ui->textEdit_Log->toPlainText().toLatin1());
@@ -695,7 +700,7 @@ err_code_t Dialog::cmd_read_version( uint32_t *p_version, uint32_t *p_revision )
 
   mavlink_msg_read_version_pack(0, 0, &tx_msg, resp, param);
   msg_send(0, &tx_msg);
-
+return err_code;
   if( resp == 1 )
   {
     if( msg_get_resp(0, &rx_msg, 500) == TRUE )
@@ -734,7 +739,7 @@ err_code_t Dialog::cmd_read_board_name( uint8_t *p_str, uint8_t *p_len )
 
   mavlink_msg_read_board_name_pack(0, 0, &tx_msg, resp, param);
   msg_send(0, &tx_msg);
-
+return err_code;
   if( resp == 1 )
   {
     if( msg_get_resp(0, &rx_msg, 500) == TRUE )
@@ -1200,7 +1205,7 @@ BOOL Dialog::msg_get_resp( uint8_t chan, mavlink_message_t *p_msg, uint32_t time
   uint32_t retry = timeout;
 
 
-  port->waitForReadyRead(1000);
+ // port->waitForReadyRead(1000);
 
   while(1)
   {
@@ -1270,7 +1275,9 @@ int Dialog::write_bytes( char *p_data, int len )
     int written_len;
     QByteArray databuf;
     databuf = QByteArray(p_data, len);
+
     written_len = port->write(databuf);
+    port->waitForBytesWritten(-1);
     //port->write("tesysdfgsdfgasdf");
     //ui->led_Tx->turnOff();
     return written_len;
