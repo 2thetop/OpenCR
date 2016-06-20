@@ -7,6 +7,7 @@
 #include <QTextCodec>
 #include <QCoreApplication>
 #include <QMessageBox>
+#include <QThread>
 #include <QDebug>
 
 #include <stdio.h>
@@ -191,18 +192,23 @@ void Dialog::onOpenCloseButtonClicked()
 
 void Dialog::onReadyRead()
 {
-    if (port->bytesAvailable()) {
+    /*if (port->bytesAvailable()) {
         QByteArray ba = port->readAll();
         ui->textEdit_Log->moveCursor(QTextCursor::End);
         ui->textEdit_Log->insertPlainText(QString::fromLatin1(ba));
-    }
+    }*/
+
+    receiveFlag = true;
 }
 
 void Dialog::onClockLabelUpdate()
 {
     QDateTime local(QDateTime::currentDateTime());
     ui->label_13->setText(local.toString("hh:mm:ss A"));
+    if(ui->led_Rx->ledStatus())ui->led_Rx->turnOff();
+    if(ui->led_Tx->ledStatus())ui->led_Tx->turnOff();
 
+    if(!ui->led_SerialOnOff->ledStatus())ui->led_MavlinkStatus->turnOff();
     //onTextBoxLogPrint("test\r\n");
 }
 
@@ -373,30 +379,16 @@ void Dialog::on_ProgramButton_clicked()
         opencr_fpsize = ftell( opencr_fp );
         fseek( opencr_fp, 0, SEEK_SET );
         onTextBoxLogPrint(">>\r\n");
-        onTextBoxLogPrint(textPrint.sprintf("file name : %s \r\n", filename));
+        onTextBoxLogPrint(textPrint.sprintf("file name :\r\n %s \r\n", filename));
         onTextBoxLogPrint(textPrint.sprintf("file size : %d KB\r\n", opencr_fpsize/1024));
     }
 
   fw_size = opencr_fpsize;
 
-  onTextBoxLogPrint(textPrint.sprintf(">>\r\n"));
-  err_code = cmd_read_board_name( board_str, &board_str_len );
-  if( err_code == OK )
-  {
-    onTextBoxLogPrint(textPrint.sprintf("Board Name : %s\r\n", board_str));
-  }
-  err_code = cmd_read_version( &board_version, &board_revision );
-  if( err_code == OK )
-  {
-    onTextBoxLogPrint(textPrint.sprintf("Board Ver  : 0x%08X\r\n", board_version));
-    onTextBoxLogPrint(textPrint.sprintf("Board Rev  : 0x%08X\r\n", board_revision));
-  }
- onTextBoxLogPrint(">>\r\n");
-
   t = iclock();
   ret = opencr_ld_flash_erase(fw_size);
   dt = iclock() - t;
-   return;
+
   onTextBoxLogPrint(textPrint.sprintf("flash_erase : %d : %f sec\r\n", ret, GET_CALC_TIME(dt)));
   if( ret < 0 )
   {
@@ -409,13 +401,13 @@ void Dialog::on_ProgramButton_clicked()
   {
       onTextBoxLogPrint("erase flash completed...\r\n");
   }
-return;
+
   t = iclock();
   crc  = 0;
   addr = 0;
   while(1)
   {
-    len = opencr_ld_file_read_data( block_buf, FLASH_TX_BLOCK_LENGTH);
+     len = opencr_ld_file_read_data( block_buf, FLASH_TX_BLOCK_LENGTH);
     if( len == 0 ) break;
 
     for( i=0; i<len; i++ )
@@ -687,7 +679,7 @@ err_code_t Dialog::cmd_read_version( uint32_t *p_version, uint32_t *p_revision )
 
   mavlink_msg_read_version_pack(0, 0, &tx_msg, resp, param);
   msg_send(0, &tx_msg);
-return err_code;
+
   if( resp == 1 )
   {
     if( msg_get_resp(0, &rx_msg, 500) == TRUE )
@@ -726,7 +718,7 @@ err_code_t Dialog::cmd_read_board_name( uint8_t *p_str, uint8_t *p_len )
 
   mavlink_msg_read_board_name_pack(0, 0, &tx_msg, resp, param);
   msg_send(0, &tx_msg);
-return err_code;
+
   if( resp == 1 )
   {
     if( msg_get_resp(0, &rx_msg, 500) == TRUE )
@@ -769,7 +761,7 @@ err_code_t Dialog::cmd_flash_fw_erase( uint32_t length )
 
   if( resp == 1 )
   {
-    if( msg_get_resp(0, &rx_msg, 3000) == TRUE )
+    if( msg_get_resp(0, &rx_msg, 10000) == TRUE )
     {
       mavlink_msg_ack_decode( &rx_msg, &ack_msg);
 
@@ -1154,6 +1146,8 @@ void Dialog::msg_send(uint8_t chan, mavlink_message_t *p_msg)
   uint16_t len;
   uint16_t write_len;
 QString textPrint;
+
+ui->led_Tx->turnOn();
   len = mavlink_msg_to_send_buffer(buf, p_msg);
 
   switch(chan)
@@ -1166,17 +1160,29 @@ QString textPrint;
     case 1:
       break;
   }
+
+  //ui->led_Tx->turnOff();
 }
 
 
 BOOL Dialog::msg_recv( uint8_t chan, uint8_t data , mavlink_message_t *p_msg, mavlink_status_t *p_status )
 {
   BOOL ret = FALSE;
-
-if (mavlink_parse_char(MAVLINK_COMM_0, data, p_msg, p_status) == MAVLINK_FRAMING_OK)
-{
-  ret = TRUE;
-}
+    ui->led_MavlinkStatus->turnOn();
+  if(chan == 0)
+  {
+    if (mavlink_parse_char(MAVLINK_COMM_0, data, p_msg, p_status) == MAVLINK_FRAMING_OK)
+    {
+      ret = TRUE;
+    }
+  }
+  else
+  {
+    if (mavlink_parse_char(MAVLINK_COMM_1, data, p_msg, p_status) == MAVLINK_FRAMING_OK)
+    {
+      ret = TRUE;
+    }
+  }
 
   return ret;
 }
@@ -1190,48 +1196,60 @@ BOOL Dialog::msg_get_resp( uint8_t chan, mavlink_message_t *p_msg, uint32_t time
   static mavlink_message_t msg[MSG_CH_MAX];
   static mavlink_status_t status[MSG_CH_MAX];
   uint32_t retry = timeout;
+    int  data_cnt;
+ int  time_out_cnt;
+    ui->led_Rx->turnOn();
+    port->waitForReadyRead(timeout);
 
-
-  ser_set_timeout_ms( 1000 );
-
-  while(1)
-  {
-    ch_ret = read_byte();
-
-    if( ch_ret < 0 )
+    if(receiveFlag == true && port->bytesAvailable())
     {
-        if( retry-- <= 0 )
+        QByteArray ch_ret = port->readAll();
+        for(data_cnt=0;data_cnt< ch_ret.length();data_cnt++)
         {
-            ret = FALSE;
+           ch = (int)ch_ret.at(data_cnt) ;
 
+            ret = msg_recv( chan, ch, &msg[chan], &status[chan] );
+
+            if( ret == TRUE )
+            {
+                *p_msg = msg[chan];
+                break;
+            }
+        }
+    }
+
+    for(time_out_cnt=0;time_out_cnt<10;time_out_cnt++)
+    {
+        if( ret != TRUE)
+        {
+           // port->waitForReadyRead(10000);
+            QThread::sleep(1);
+            if(port->bytesAvailable())
+            {
+                QByteArray ch_ret = port->readAll();
+                for(data_cnt=0;data_cnt< ch_ret.length();data_cnt++)
+                {
+                   ch = (int)ch_ret.at(data_cnt) ;
+
+                    ret = msg_recv( chan, ch, &msg[chan], &status[chan] );
+
+                    if( ret == TRUE )
+                    {
+                        *p_msg = msg[chan];
+                        break;
+                    }
+                }
+            }
+       }
+       else
+       {
             break;
-        }
-        else
-        {
-            continue;
-        }
+       }
     }
-    else
-    {
-      ch = (uint8_t)(ch_ret);
-      retry = timeout;
-    }
+    receiveFlag =false;
 
-    ret = msg_recv( chan, ch, &msg[chan], &status[chan] );
-
-    if( ret == TRUE )
-    {
-        ui->led_MavlinkStatus->turnOn();
-        *p_msg = msg[chan];
-        break;
-    }
-    else
-    {
-        ui->led_MavlinkStatus->turnOff();
-    }
-  }
-
-  return ret;
+   // ui->led_Rx->g->turnOff();
+    return ret;
 }
 
 
@@ -1254,9 +1272,9 @@ int Dialog::read_byte( void )
 {
     //return ser_read_byte( stm32_ser_id );
     char byte;
-    ui->led_Rx->turnOn();
+
     port->read(&byte,1);
-    ui->led_Rx->turnOff();
+
     return (int)byte;
 }
 
@@ -1268,10 +1286,10 @@ int Dialog::read_byte( void )
 int Dialog::write_bytes( char *p_data, int len )
 {
     int written_len;
-    ui->led_Tx->turnOn();
+
     //written_len = ser_write( stm32_ser_id, (const u8 *)p_data, len );
     written_len = port->write(p_data,len);
-    ui->led_Tx->turnOff();
+
     return written_len;
 }
 
@@ -1330,4 +1348,9 @@ void Dialog::on_bn_ReadBoardVersion_clicked()
     {
         onTextBoxLogPrint("port is not opened...\r\n");
     }
+}
+
+void Dialog::on_sendButton_3_clicked()
+{
+
 }

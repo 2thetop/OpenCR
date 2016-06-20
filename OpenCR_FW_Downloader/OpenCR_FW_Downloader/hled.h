@@ -21,7 +21,7 @@ public slots:
     void toggle();
     void turnOn(bool on=true);
     void turnOff(bool off=true);
-
+    bool ledStatus();
 protected:
     void paintEvent(QPaintEvent *);
     int ledWidth() const;

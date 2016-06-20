@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_HLed_t {
-    QByteArrayData data[9];
-    char stringdata0[50];
+    QByteArrayData data[10];
+    char stringdata0[60];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -37,11 +37,12 @@ QT_MOC_LITERAL(4, 21, 6), // "toggle"
 QT_MOC_LITERAL(5, 28, 6), // "turnOn"
 QT_MOC_LITERAL(6, 35, 2), // "on"
 QT_MOC_LITERAL(7, 38, 7), // "turnOff"
-QT_MOC_LITERAL(8, 46, 3) // "off"
+QT_MOC_LITERAL(8, 46, 3), // "off"
+QT_MOC_LITERAL(9, 50, 9) // "ledStatus"
 
     },
     "HLed\0setColor\0\0color\0toggle\0turnOn\0"
-    "on\0turnOff\0off"
+    "on\0turnOff\0off\0ledStatus"
 };
 #undef QT_MOC_LITERAL
 
@@ -51,7 +52,7 @@ static const uint qt_meta_data_HLed[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   14, // methods
+       7,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -59,12 +60,13 @@ static const uint qt_meta_data_HLed[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   44,    2, 0x0a /* Public */,
-       4,    0,   47,    2, 0x0a /* Public */,
-       5,    1,   48,    2, 0x0a /* Public */,
-       5,    0,   51,    2, 0x2a /* Public | MethodCloned */,
-       7,    1,   52,    2, 0x0a /* Public */,
-       7,    0,   55,    2, 0x2a /* Public | MethodCloned */,
+       1,    1,   49,    2, 0x0a /* Public */,
+       4,    0,   52,    2, 0x0a /* Public */,
+       5,    1,   53,    2, 0x0a /* Public */,
+       5,    0,   56,    2, 0x2a /* Public | MethodCloned */,
+       7,    1,   57,    2, 0x0a /* Public */,
+       7,    0,   60,    2, 0x2a /* Public | MethodCloned */,
+       9,    0,   61,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void, QMetaType::QColor,    3,
@@ -73,6 +75,7 @@ static const uint qt_meta_data_HLed[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::Bool,    8,
     QMetaType::Void,
+    QMetaType::Bool,
 
        0        // eod
 };
@@ -89,6 +92,8 @@ void HLed::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
         case 3: _t->turnOn(); break;
         case 4: _t->turnOff((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 5: _t->turnOff(); break;
+        case 6: { bool _r = _t->ledStatus();
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
         default: ;
         }
     }
@@ -119,13 +124,13 @@ int HLed::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 6)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 7;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 6)
+        if (_id < 7)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 6;
+        _id -= 7;
     }
     return _id;
 }

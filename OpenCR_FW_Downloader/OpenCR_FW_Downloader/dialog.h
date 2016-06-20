@@ -57,6 +57,8 @@ private slots:
 
     void on_bn_ReadBoardVersion_clicked();
 
+    void on_sendButton_3_clicked();
+
 private:
     Ui::Dialog *ui;
     QTimer *timer;
@@ -68,6 +70,8 @@ public:
     QStringList fileNames;
      FILE      *opencr_fp;
      uint32_t   opencr_fpsize;
+
+     bool receiveFlag;
 
     void onTextBoxLogPrint(QString str);
     //int opencr_ld_down( int argc, const char **argv );

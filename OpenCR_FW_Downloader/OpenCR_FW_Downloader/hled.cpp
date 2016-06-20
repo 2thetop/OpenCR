@@ -57,6 +57,11 @@ void HLed::turnOn(bool on)
     update();
 }
 
+bool HLed::ledStatus()
+{
+   return m_d->isOn;
+}
+
 void HLed::turnOff(bool off)
 {
     turnOn(!off);
