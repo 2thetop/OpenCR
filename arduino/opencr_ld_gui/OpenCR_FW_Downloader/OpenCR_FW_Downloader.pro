@@ -9,7 +9,7 @@ QT += concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = OpenCR_FW_Downloader
+TARGET = opencr_ld_gui
 TEMPLATE = app
 
 include(./qextserialport/qextserialport.pri)
