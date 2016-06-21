@@ -51,6 +51,8 @@ private slots:
     void onPortAddedOrRemoved();
 
     void on_ProgramButton_clicked();
+    void ProgramThread_run();
+    void ProgramThread_quit();
     void on_LoadFirmwareButton_clicked();
 
     void on_bn_ReadBoardName_clicked();

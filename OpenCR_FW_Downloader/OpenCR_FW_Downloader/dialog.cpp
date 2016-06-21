@@ -8,6 +8,8 @@
 #include <QCoreApplication>
 #include <QMessageBox>
 #include <QThread>
+#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/qtconcurrentrun.h>
 #include <QDebug>
 
 #include <stdio.h>
@@ -323,6 +325,21 @@ void Dialog::on_LoadFirmwareButton_clicked()
 
 void Dialog::on_ProgramButton_clicked()
 {
+    QFutureWatcher<void> watcher;
+    QObject::connect(&watcher, SIGNAL(finished()), SLOT(ProgramThread_quit()));
+
+    QFuture<void> future = QtConcurrent::run(this,ProgramThread_run);
+    watcher.setFuture(future);
+
+  return;
+}
+void Dialog::ProgramThread_quit()
+{
+
+    return;
+}
+void Dialog::ProgramThread_run()
+{
     int i;
     int j;
     int ret = 0;
@@ -407,6 +424,7 @@ void Dialog::on_ProgramButton_clicked()
   addr = 0;
   while(1)
   {
+    // ui->progressBar_Status->setValue(100*addr/fw_size);
      len = opencr_ld_file_read_data( block_buf, FLASH_TX_BLOCK_LENGTH);
     if( len == 0 ) break;
 
@@ -418,7 +436,10 @@ void Dialog::on_ProgramButton_clicked()
     ret = opencr_ld_flash_write( addr, block_buf, len );
     if( ret < 0 ) break;
     addr += len;
+
+    ui->textEdit_Log->insertPlainText(".");
   }
+  ui->textEdit_Log->insertPlainText("\r\n");
   dt = iclock() - t;
 
  onTextBoxLogPrint(textPrint.sprintf("flash_write : %d : %f sec \r\n", ret,  GET_CALC_TIME(dt)));
@@ -446,9 +467,10 @@ void Dialog::on_ProgramButton_clicked()
 
   port->close();
   fclose( opencr_fp );
-
-  return;
 }
+
+
+
 
 //==================================================================
 //member functions
